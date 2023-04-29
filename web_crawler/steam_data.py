@@ -94,10 +94,9 @@ def get_game_detail(app_id_list, num, game_detail_out_file):
             resp = requests.get(url_temp, header)
 
             obj = resp.json()
-            print(obj)
             if obj is not None:
                 for key in obj:
-                    print(key)
+
                     if obj[key]["success"] is True:
                         json.dump(obj[key]["data"], f)
                         f.write('\n')
@@ -116,19 +115,31 @@ def process_json_obj(resp, user_out_file, user_id):
             obj = {'steamid': user_id}
             print(e)
     elif 'user_owned_games' in user_out_file:
-        obj = resp.json()['response']
-        obj = {'steamid': user_id, 'game_count': obj['game_count'], 'games': obj['games']}
-    elif 'user_friend_list' in user_out_file:
-        obj = resp.json()['friendslist']
-        obj = {'steamid': user_id, 'friends': obj['friends']}
-    elif 'user_recently_played_games' in user_out_file:
-        obj = resp.json()['response']
         try:
+            obj = resp.json()['response']
+            obj = {'steamid': user_id, 'game_count': obj['game_count'], 'games': obj['games']}
+        except Exception as e:
+            print(e)
+            obj = {'steamid': user_id, 'game_count': -1, 'games': []}
+    elif 'user_friend_list' in user_out_file:
+        try:
+            obj = resp.json()['friendslist']
+            obj = {'steamid': user_id, 'friends': obj['friends']}
+        except Exception as e:
+            print(e)
+            obj = {'steamid': user_id, 'friends': []}
+    elif 'user_recently_played_games' in user_out_file:
+        try:
+            obj = resp.json()['response']
             obj = {'steamid': user_id, 'total_count': obj['total_count'], 'games': obj['games']}
         except Exception as e:
             # corner case: total_count is zero
             print(e)
-            obj = {'steamid': user_id, 'total_count': obj['total_count'], 'games': []}
+            if 'total_count' in obj:
+                obj = {'steamid': user_id, 'total_count': obj['total_count'], 'games': []}
+            else:
+                obj = {'steamid': user_id, 'total_count': -1, 'games': []}
+
     return obj
 
 
@@ -136,7 +147,9 @@ def dump_user_info(url, user_ids, user_out_file):
     with open(user_out_file, 'w') as f:
         for user_id in user_ids:
             url_temp = url + str(user_id)
+            print(url_temp)
             resp = requests.get(url_temp)
+
             # resp = requests.head(url_temp)
             obj = process_json_obj(resp, user_out_file, user_id)
             json.dump(obj, f)

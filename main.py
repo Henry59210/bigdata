@@ -14,7 +14,7 @@ key = '8F8BBCEDF2B6E75EDC1F65A9DADB9A0E'
 if __name__ == '__main__':
 
     # step 1: get userID
-    member_list_page_no = 1
+    member_list_page_no = 300
     user_ids = []
     for idx in range(1, member_list_page_no + 1):
         print("Member List " + str(idx))
@@ -48,37 +48,3 @@ if __name__ == '__main__':
     # a list of games a player has played in the last two weeks
     url = 'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=' + key + '&steamid='
     dump_user_info(url, user_ids, 'data/user_recently_played_games_sample.json')
-
-# 多线程版本
-# pages_to_iterate = 400
-# concurrency = 10
-# # each thread gets its own "user_ids_mt" list
-# user_ids_mt = defaultdict(list)
-#
-#
-# def get_online_users_wrapper(lower_bound, upper_bound, user_ids_local):
-#     for idx in range(pages_lower_bound, pages_upper_bound):
-#         get_online_users(idx, user_ids_local)
-#
-#
-# threadlist = []
-# for thread_id in range(concurrency):
-#     user_ids_local = user_ids_mt[thread_id]
-#     pages_lower_bound = pages_to_iterate / concurrency * thread_id + 1
-#     pages_upper_bound = pages_to_iterate / concurrency + pages_lower_bound
-#     # print pages_lower_bound
-#     # print pages_upper_bound
-#     thread = Thread(target=get_online_users_wrapper, args=(pages_lower_bound, pages_upper_bound, user_ids_local,))
-#     thread.start()
-#     threadlist.append(thread)
-#
-# for thread in threadlist:
-#     thread.join()
-# user_ids_flatten = []
-# for concur in range(concurrency):
-#     user_ids_flatten.extend(user_ids_mt[concur])
-#
-# print("Total users found in the first " + str(pages_to_iterate) + " pages of online member list:")
-# print(len(user_ids_flatten))
-#
-# dump_user_id(user_ids_flatten, 'user_idx_full.json')
