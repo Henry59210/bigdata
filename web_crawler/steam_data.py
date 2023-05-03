@@ -49,11 +49,12 @@ def get_online_users(member_list_no, user_ids):
 
 
 # step2: write id in file
-def dump_user_id(user_ids, user_out_file):
+def dump_user_id(user_ids, user_out_file, user_id_content):
     with open(user_out_file, 'w') as f:
         for idx in range(0, len(user_ids)):
             user_id_idx = {'user_idx': idx, 'user_id': user_ids[idx]}
             json.dump(user_id_idx, f)
+            user_id_content.append(user_id_idx)
             f.write('\n')
 
 
@@ -78,7 +79,7 @@ def get_app_id_list():
     return app_id_list
 
 
-def get_game_detail(app_id_list, num, game_detail_out_file):
+def get_game_detail(app_id_list, num, game_detail_out_file, game_detail_content):
     url = 'https://store.steampowered.com/api/appdetails?appids='
     header = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -99,6 +100,7 @@ def get_game_detail(app_id_list, num, game_detail_out_file):
 
                     if obj[key]["success"] is True:
                         json.dump(obj[key]["data"], f)
+                        game_detail_content.append(obj[key]["data"])
                         f.write('\n')
             else:
                 print(idx)
@@ -144,6 +146,7 @@ def process_json_obj(resp, user_out_file, user_id):
 
 
 def dump_user_info(url, user_ids, user_out_file):
+    user_info_content = []
     with open(user_out_file, 'w') as f:
         for user_id in user_ids:
             url_temp = url + str(user_id)
@@ -152,5 +155,7 @@ def dump_user_info(url, user_ids, user_out_file):
 
             # resp = requests.head(url_temp)
             obj = process_json_obj(resp, user_out_file, user_id)
+            user_info_content.append(obj)
             json.dump(obj, f)
             f.write('\n')
+    return user_info_content
