@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # step 2: write id in file
     user_id_content = []
     dump_user_id(user_ids, 'data/user_idx_sample.json', user_id_content)
-    kafka_util.push_message('user_idx', user_id_content)
+    producer.push_message('user_idx', user_id_content)
 
     # step3: Get all games info
     app_id_list = get_app_id_list()
@@ -34,26 +34,26 @@ if __name__ == '__main__':
 
     game_detail_content = []
     get_game_detail(app_id_list, 1000, "data/game_detail.json", game_detail_content)
-    kafka_util.push_message('game_detail', game_detail_content)
+    producer.push_message('game_detail', game_detail_content)
 
     # step 4: Get user related info
 
     # basic profile information for a list of 64-bit Steam IDs.
     url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' + key + '&steamids='
     user_summary = dump_user_info(url, user_ids, 'data/user_summary_sample.json')
-    kafka_util.push_message('user_summary', user_summary)
+    producer.push_message('user_summary', user_summary)
 
     # A list of games a player owns along with some playtime information,
     url = 'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=' + key + '&steamid='
     user_owned_games = dump_user_info(url, user_ids, 'data/user_owned_games_sample.json')
-    kafka_util.push_message('user_owned_games', user_owned_games)
+    producer.push_message('user_owned_games', user_owned_games)
 
     # Friend list of any Steam user, provided their Steam Community profile visibility is set to "Public".
     url = 'http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=' + key + '&steamid='
     user_friend_list = dump_user_info(url, user_ids, 'data/user_friend_list_sample.json')
-    kafka_util.push_message('user_friend_list', user_friend_list)
+    producer.push_message('user_friend_list', user_friend_list)
 
     # a list of games a player has played in the last two weeks
     url = 'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=' + key + '&steamid='
     user_recently_played_games = dump_user_info(url, user_ids, 'data/user_recently_played_games_sample.json')
-    kafka_util.push_message('user_recently_played_games', user_recently_played_games)
+    producer.push_message('user_recently_played_games', user_recently_played_games)
