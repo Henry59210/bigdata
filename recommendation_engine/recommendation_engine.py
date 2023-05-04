@@ -107,6 +107,17 @@ if __name__ == '__main__':
     df_friend_list.show(10)
     df_friend_list.registerTempTable('user_friend_list')
 
+    spark.sql("SELECT game_id, SUM(playtime_forever) AS play_time FROM \
+                (SELECT games['appid'] AS game_id, games['playtime_forever'] AS playtime_forever FROM \
+                (SELECT a.steamid, EXPLODE(b.games) AS games \
+                FROM user_friend_list a, user_owned_games b WHERE a.steamid = b.steamid) c) d \
+                GROUP BY game_id ORDER BY play_time DESC LIMIT 10") \
+        .registerTempTable('temp_local_popular_games')
+
+    df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS game_name, a.play_time FROM \
+                                            temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
+    df_global_popular_games.show()
+
     # df_user_firend_list = spark.read.json()
     # df_user_firend_list.registerTempTable('friend_list')
     # #这里要从friend_list里把friends拉出来作为新的df，和game_list一样
