@@ -4,6 +4,7 @@ from threading import Thread
 
 import requests
 
+from recommendation_engine.recommendation_engine import hiveCtx, game_detail
 from web_crawler.steam_data import get_online_users, dump_user_id, get_app_id_list, get_game_detail, dump_user_info
 
 # Press ⌃R to execute it or replace it with your code.
@@ -48,3 +49,5 @@ if __name__ == '__main__':
     # a list of games a player has played in the last two weeks
     url = 'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=' + key + '&steamid='
     dump_user_info(url, user_ids, 'data/user_recently_played_games_sample.json')
+
+

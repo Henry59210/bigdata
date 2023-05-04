@@ -29,8 +29,13 @@ def get_user_id(user_profile, user_ids):
 
 def get_online_users(member_list_no, user_ids):
     url = 'https://steamcommunity.com/games/steam/members?p=' + str(member_list_no)
-
-    resp = requests.get(url)
+    header = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/57.0.2987.133 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, sdch',
+        'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2'}
+    resp = requests.get(url, header)
 
     soup = bs(resp.text, 'html.parser')
     # print(soup.prettify())
