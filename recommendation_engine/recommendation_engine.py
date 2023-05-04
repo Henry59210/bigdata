@@ -46,7 +46,7 @@ if __name__ == '__main__':
     try:
         df_tmp = spark.sql("SELECT * FROM game_detail")
         print('***************************************************************************************************************')
-        spark.sql("SELECT explode(games) AS played_games FROM user_owned_games").show()
+        spark.sql("SELECT explode(games) FROM user_owned_games").show()
         print('***************************************************************************************************************')
         spark.sql("SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
     #             FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games)").show()
