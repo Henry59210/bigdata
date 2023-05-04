@@ -6,6 +6,8 @@ import requests
 from bs4 import BeautifulSoup as bs
 from contextlib import closing
 
+from kafka_utils.producer import push_message
+
 key = '8F8BBCEDF2B6E75EDC1F65A9DADB9A0E'
 
 
@@ -54,7 +56,8 @@ def dump_user_id(user_ids, user_out_file, user_id_content):
         for idx in range(0, len(user_ids)):
             user_id_idx = {'user_idx': idx, 'user_id': user_ids[idx]}
             json.dump(user_id_idx, f)
-            user_id_content.append(user_id_idx)
+            push_message('user_idx', json.dumps(user_id_idx))
+            # user_id_content.append(user_id_idx)
             f.write('\n')
 
 
@@ -100,7 +103,7 @@ def get_game_detail(app_id_list, num, game_detail_out_file, game_detail_content)
 
                     if obj[key]["success"] is True:
                         json.dump(obj[key]["data"], f)
-                        game_detail_content.append(obj[key]["data"])
+                        push_message('game_detail', json.dumps(obj[key]["data"]))
                         f.write('\n')
             else:
                 print(idx)
@@ -145,7 +148,7 @@ def process_json_obj(resp, user_out_file, user_id):
     return obj
 
 
-def dump_user_info(url, user_ids, user_out_file):
+def dump_user_info(topic, url, user_ids, user_out_file):
     user_info_content = []
     with open(user_out_file, 'w') as f:
         for user_id in user_ids:
@@ -157,5 +160,6 @@ def dump_user_info(url, user_ids, user_out_file):
             obj = process_json_obj(resp, user_out_file, user_id)
             user_info_content.append(obj)
             json.dump(obj, f)
+            push_message(topic, json.dumps(obj))
             f.write('\n')
     return user_info_content
