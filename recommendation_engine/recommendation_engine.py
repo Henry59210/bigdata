@@ -1,7 +1,6 @@
 from pyspark.shell import spark
 from pyspark.sql import SparkSession
 
-from hdfs_utils.load import load_topic
 
 # game detail data
 
