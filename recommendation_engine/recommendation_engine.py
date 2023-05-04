@@ -43,15 +43,12 @@ if __name__ == '__main__':
     df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json")
     df_game_detail.registerTempTable("game_detail")
 
-    try:
-        df_tmp = spark.sql("SELECT * FROM game_detail")
-        print('***************************************************************************************************************')
-        spark.sql("SELECT explode(games) FROM user_owned_games").show()
-        print('***************************************************************************************************************')
-        spark.sql("SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
-    #             FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games)").show()
-    except:
-        pass
+    df_tmp = spark.sql("SELECT * FROM game_detail")
+    print('***************************************************************************************************************')
+    spark.sql("SELECT explode(games) AS played_games FROM user_owned_games").show()
+    print('***************************************************************************************************************')
+    spark.sql("SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
+             FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games)").show()
 
     # rdd = spark.sparkContext.parallelize(result)
     #
