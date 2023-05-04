@@ -171,20 +171,21 @@ if __name__ == '__main__':
 #     cnx = mysql.connector.connect(user='root', password='111111',
 #                                   host='localhost',
 #                                   database='wtf')
-    df_global_popular_games.show()
+
     #
     # 有个中间数据型要先写入json
     sample_recommended = 'sample_result/sample_recommended.json'
+    # 这里我看x应该是可以写入default创建文件的，但执行的时候报错没有这个文件，新建一个应该就行问题不大，看你们要不要试一下直接存MySQL，这段我看不太懂
     with open(sample_recommended, 'x') as output_file:
         for user_idx in range(0, df_user_idx.count()):
             try:
                 lst_recommended = [i.product for i in als_model.recommendProducts(user_idx, 10)]
-                rank = 1
+                ranks = 1
                 for app_id in lst_recommended:
-                    dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'rank': rank}
+                    dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'ranks': ranks}
                     json.dump(dict_recommended, output_file)
                     output_file.write('\n')
-                    rank += 1
+                    ranks += 1
             # some user index may not in the recommendation result since it's been filtered out
             except:
                 pass
@@ -193,12 +194,18 @@ if __name__ == '__main__':
     df_recommend_result.show(20)
 
     df_recommend_result.registerTempTable('recommend_result')
-    # 这个df_final_recommend_result要存入MySQL
-    df_final_recommend_result = spark.sql("SELECT DISTINCT b.user_id, a.rank, c.name, c.header_image, c.steam_appid \
+    # 这个df_final_recommend_result要存入MySQL(这条还没测试不清楚，因为上面那个存json的文件暂时不确定要不要这么写)
+    df_final_recommend_result = spark.sql("SELECT DISTINCT b.user_id, a.ranks, c.name, c.header_image, c.steam_appid \
                                             FROM recommend_result a, user_idx b, game_detail c \
                                             WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
-                                            ORDER BY b.user_id, a.rank")
+                                            ORDER BY b.user_id, a.ranks")
     df_final_recommend_result.show(20)
+
+#     现在的问题有两个，一个是存到MySQL里面，这个我没看到表先没搞；另一个是样例中store the recommendation results to aws rds这一块，他存了个df_global_popular_games表，但这个表
+#     你仔细看会发现这玩意...和他下面的执行结果结构不一样，所以不知道他这一步是什么东西，如果搞不定我觉得可以忽略掉这个表，如果要保留，我猜是这么写的，game_detail里确实有这两个参数
+#     但现在这个数据是空的，因为他好像是根据friend_list来实现一个global的rank，但数据量的问题导致这个过程中某个friends表是空的，所以不确定
+df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS name, a.play_time AS rank, b.steam_appid, b.header_image FROM \
+                                            temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
 
 
 
