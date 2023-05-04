@@ -1,10 +1,8 @@
-import pandas as pd
-import json
 
 from pyspark.shell import spark, sc
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import explode
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, ArrayType
+from pyspark.sql.functions import explode
 
 # game detail data
 
@@ -53,5 +51,47 @@ if __name__ == '__main__':
                     "game.rtime_last_played as rtime_last_played")
 
     userOwnedGameDf.show()
+    #Load User Owned Games
+    # top 10 games which have longest total played hours
+    userOwnedGameDf.select("appid")
+    df_global_popular_games = userOwnedGameDf.select("appid AS game_id", "playtime_forever AS playtime_forever").groupby("game_id").agg({"playtime_forever":"sum"}).withColumnRenamed("sum(playtime_forever)", "play_time").orderBy("play_time", ascending=False).limit(10)
+    df_global_popular_games.registerTempTable('popular_games')
+
+    #重写
+    df_global_popular_games = \
+        spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
+                (SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
+                FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games) a) b \
+                GROUP BY game_id ORDER BY play_time DESC LIMIT 10")
+    df_global_popular_games.registerTempTable('popular_games')
+
+    df_global_popular_games = spark.sql("SELECT b.name AS name, a.play_time AS rank, b.steam_appid, b.header_image FROM \
+                                        popular_games a, game_detail b WHERE a.game_id = b.steam_appid ORDER BY rank DESC")
+    df_global_popular_games.show()
+
+    #find same app id in popular_games and game_detail
+    #total played_hours is defined as rank
+    df_game_detail = spark.read.json()
+    df_global_popular_games = df_game_detail.join(df_global_popular_games, df_game_detail.steam_appid == df_global_popular_games.game_id).select(df_game_detail.name.alias('name'), df_global_popular_games.play_time.alias('ranks'), df_game_detail.steam_appid, df_game_detail.header_image).orderBy("ranks", ascending=False)
+
+    df_global_popular_games.show()
+
+    #Local Popularity
+    #find his/her friends
+    df_user_firend_list = spark.read.json()
+    df_user_firend_list.registerTempTable('friend_list')
+    #这里要从friend_list里把friends拉出来作为新的df，和game_list一样
+    sample_user = ''
+    friends = df_user_firend_list.select(explode("friends").alias("friends")).filter('steamid = ' + sample_user)
+    #假设sample_user = ''，这是要可视化部份传的参数
+    df_friend_list = friends.select(friends.steamid.alias('steamid'))
+    df_friend_list.show(10)
+    df_friend_list.registerTempTable('user_friend_list')
+    #find out the total playtime of all friends for each game
+    temp_df = df_user_firend_list.join(userOwnedGameDf, 'steamid').select(df_user_firend_list.steamid, explode(userOwnedGameDf.games).alias("games"))
+    temp_df.select('appid'.alias("game_id"), 'playtime_forever').select("game_id", )
+
+
+
 
 
