@@ -1,6 +1,6 @@
 import json
 
-import mysql
+import mysql.connector
 from pyspark.sql import SparkSession
 from pyspark.mllib.recommendation import ALS
 
