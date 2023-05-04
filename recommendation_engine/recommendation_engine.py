@@ -50,7 +50,7 @@ if __name__ == '__main__':
         spark.sql("SELECT EXPLODE(games) AS played_games FROM user_owned_games").show()
         print('***************************************************************************************************************')
         spark.sql("SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
-    #             FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games)")
+    #             FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games)").show()
     except:
         pass
 
