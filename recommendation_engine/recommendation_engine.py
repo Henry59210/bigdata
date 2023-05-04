@@ -148,7 +148,6 @@ if __name__ == '__main__':
     df_user_idx.registerTempTable('user_idx')
     df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
                                                 JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
-    df_valid_user_recent_games.printSchema()
     df_valid_user_recent_games.show(10)
 
     # training_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
