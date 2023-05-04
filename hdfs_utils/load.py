@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 
+
 def load_topic(topic):
     # 创建 SparkSession
     spark = SparkSession.builder \

@@ -10,5 +10,13 @@ topicsList = ["game_detail", "user_owned_games", "user_friend_list", "user_recen
 
 if __name__ == '__main__':
     for i in topicsList:
-        result = load_topic(i)
-        print(result)
+        spark = SparkSession.builder \
+            .appName("Read HDFS Files") \
+            .getOrCreate()
+
+        # 定义 HDFS 目录
+        hdfs_dir = "hdfs://localhost:9000/topics/" + i + "/partition=0/"
+
+        # 获取目录下所有文件的文件名
+        file_names = spark.sparkContext.textFile(hdfs_dir).collect()
+        print(file_names)
