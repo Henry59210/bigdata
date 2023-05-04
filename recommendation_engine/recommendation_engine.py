@@ -69,9 +69,16 @@ if __name__ == '__main__':
 
     # #Load User Owned Games
     # # top 10 games which have longest total played hours
-    df_user_owned_games.select("appid")
-    df_global_popular_games = df_user_owned_games.select("appid AS game_id", "playtime_forever AS playtime_forever").groupby("game_id").agg({"playtime_forever":"sum"}).withColumnRenamed("sum(playtime_forever)", "play_time").orderBy("play_time", ascending=False).limit(10)
+    spark.sql("SELECT * FROM user_owned_games").show()
+    print('***************************************************************************************************************')
+    spark.sql("SELECT * FROM game_detail").show()
+    print('***************************************************************************************************************')
+    df_global_popular_games = df_user_owned_games.select("appid".alias("game_id"), "playtime_forever AS playtime_forever").groupby("game_id").agg({"playtime_forever":"sum"}).withColumnRenamed("sum(playtime_forever)", "play_time").orderBy("play_time", ascending=False).limit(10)
     df_global_popular_games.registerTempTable('popular_games')
+
+    df_global_popular_games.show()
+    print(
+        '***************************************************************************************************************')
 
     #重写
     # df_global_popular_games = \
