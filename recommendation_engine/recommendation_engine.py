@@ -13,5 +13,5 @@ if __name__ == '__main__':
         .getOrCreate()
 
     for i in topicsList:
-        df = spark.read.json("hdfs://localhost:9000/topics/" + i + "partition=0")
+        df = spark.read.json("hdfs://localhost:9000/topics/" + i + "/partition=0")
         print(df)
