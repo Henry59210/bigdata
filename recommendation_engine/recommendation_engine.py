@@ -84,6 +84,7 @@ if __name__ == '__main__':
                 (SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
                 FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games) a) b \
                 GROUP BY game_id ORDER BY play_time DESC LIMIT 10")
+    df_global_popular_games.show()
     df_global_popular_games.registerTempTable('popular_games')
 
     df_global_popular_games = spark.sql("SELECT b.name AS name, a.play_time AS rank, b.steam_appid, b.header_image FROM \
