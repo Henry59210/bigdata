@@ -40,6 +40,9 @@ if __name__ == '__main__':
     df_user_owned_games = spark.read.json("hdfs://localhost:9000/topics/user_owned_games/partition=0/*.json")
     df_user_owned_games.registerTempTable("user_owned_games")
 
+    df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json")
+    df_game_detail.registerTempTable("game_detail")
+
     # rdd = spark.sparkContext.parallelize(result)
     #
     # userOwnedGameDf = spark.read.json(rdd)
