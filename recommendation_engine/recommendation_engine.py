@@ -45,7 +45,11 @@ if __name__ == '__main__':
     df_game_detail.show()
 
     try:
-        spark.sql("SELECT * FROM game_detail")
+        df_tmp = spark.sql("SELECT * FROM game_detail")
+        df_tmp.show()
+        print('***************************************************************************************************************')
+        spark.sql("SELECT * FROM user_owned_games")
+        print('***************************************************************************************************************')
     except:
         pass
 
