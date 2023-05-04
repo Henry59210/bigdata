@@ -37,14 +37,6 @@ if __name__ == '__main__':
     # user ownd game表格
     spark = SparkSession.builder.appName("games").getOrCreate()
 
-    df_user_owned_games = spark.read.json("hdfs://localhost:9000/topics/user_owned_games/partition=0/*.json")
-    df_user_owned_games.registerTempTable("user_owned_games")
-
-    df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json")
-    df_game_detail.registerTempTable("game_detail")
-
-    df_user_friend_list = spark.read.json("hdfs://localhost:9000/topics/user_friend_list/partition=0/*.json")
-    df_user_friend_list.registerTempTable("friend_list")
 
     # try:
     #     df_tmp = spark.sql("SELECT * FROM game_detail")
@@ -82,7 +74,15 @@ if __name__ == '__main__':
     #
     # df_global_popular_games.show()
     #重写
-    # #Load User Owned Games
+    # Load
+    # User
+    # Owned
+    # Games
+    df_user_owned_games = spark.read.json("hdfs://localhost:9000/topics/user_owned_games/partition=0/*.json")
+    df_user_owned_games.registerTempTable("user_owned_games")
+
+    df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json")
+    df_game_detail.registerTempTable("game_detail")
     # # top 10 games which have longest total played hours
     df_global_popular_games = \
         spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
@@ -99,14 +99,17 @@ if __name__ == '__main__':
     # df_global_popular_games = df_game_detail.join(df_global_popular_games, df_game_detail.steam_appid == df_global_popular_games.game_id).select(df_game_detail.name.alias('name'), df_global_popular_games.play_time.alias("ranks"), df_game_detail.steam_appid, df_game_detail.header_image).orderBy("ranks", ascending=False)
     # df_global_popular_games.show()
 
-    # #Local Popularity
+    # #Local
+    # Popularity
     # #find his/her friends
+    df_user_friend_list = spark.read.json("hdfs://localhost:9000/topics/user_friend_list/partition=0/*.json")
+    df_user_friend_list.registerTempTable("friend_list")
     sample_user = '76561198064744540'
     df_friend_list = spark.sql("SELECT friends['steamid'] AS steamid FROM \
                 (SELECT EXPLODE(friends) AS friends FROM friend_list WHERE steamid = %s) a" % sample_user)
     df_friend_list.show(10)
     df_friend_list.registerTempTable('user_friend_list')
-
+    # find out the total playtime of all friends for each game
     spark.sql("SELECT game_id, SUM(playtime_forever) AS play_time FROM \
                 (SELECT games['appid'] AS game_id, games['playtime_forever'] AS playtime_forever FROM \
                 (SELECT a.steamid, EXPLODE(b.games) AS games \
@@ -117,6 +120,7 @@ if __name__ == '__main__':
     df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS game_name, a.play_time FROM \
                                             temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
     df_global_popular_games.show()
+
 
     # df_user_firend_list = spark.read.json()
     # df_user_firend_list.registerTempTable('friend_list')
@@ -130,6 +134,27 @@ if __name__ == '__main__':
     # #find out the total playtime of all friends for each game
     # temp_df = df_user_firend_list.join(userOwnedGameDf, 'steamid').select(df_user_firend_list.steamid, explode(userOwnedGameDf.games).alias("games"))
     # temp_df.select('appid'.alias("game_id"), 'playtime_forever').select("game_id")
+
+    # Collaborative
+    # Filtering
+    # Recommendation
+    # System
+    df_user_recent_games = spark.read.json("hdfs://localhost:9000/topics/user_recently_played_games/partition=0/*.json")
+    df_user_recent_games.registerTempTable("user_recent_games")
+    df_valid_user_recent_games = spark.sql("SELECT * FROM user_recent_games where total_count != 0")
+    df_valid_user_recent_games.show(1)
+
+    df_user_idx = spark.read.json("hdfs://localhost:9000/topics/user_idx/partition=0/*.json")
+    df_user_idx.registerTempTable('user_idx')
+    df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
+                                                JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
+    df_valid_user_recent_games.printSchema()
+    df_valid_user_recent_games.show(10)
+
+    # training_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
+    #     .map(lambda (x, y): (x, y.appid, y.playtime_forever)) \
+    #     .filter(lambda (x, y, z): z > 0)
+    # training_rdd.collect()
 
 
 
