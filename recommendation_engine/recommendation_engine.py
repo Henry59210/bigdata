@@ -42,6 +42,7 @@ if __name__ == '__main__':
 
     df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json")
     df_game_detail.registerTempTable("game_detail")
+    df_game_detail.show()
 
     # rdd = spark.sparkContext.parallelize(result)
     #
@@ -63,16 +64,16 @@ if __name__ == '__main__':
     # df_global_popular_games.registerTempTable('popular_games')
 
     #重写
-    df_global_popular_games = \
-        spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
-                (SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
-                FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games) a) b \
-                GROUP BY game_id ORDER BY play_time DESC LIMIT 10")
-    df_global_popular_games.registerTempTable('popular_games')
-
-    df_global_popular_games = spark.sql("SELECT b.name AS name, a.play_time AS rank, b.steam_appid, b.header_image FROM \
-                                        popular_games a, game_detail b WHERE a.game_id = b.steam_appid ORDER BY rank DESC")
-    df_global_popular_games.show()
+    # df_global_popular_games = \
+    #     spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
+    #             (SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
+    #             FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games) a) b \
+    #             GROUP BY game_id ORDER BY play_time DESC LIMIT 10")
+    # df_global_popular_games.registerTempTable('popular_games')
+    #
+    # df_global_popular_games = spark.sql("SELECT b.name AS name, a.play_time AS rank, b.steam_appid, b.header_image FROM \
+    #                                     popular_games a, game_detail b WHERE a.game_id = b.steam_appid ORDER BY rank DESC")
+    # df_global_popular_games.show()
 
     # #find same app id in popular_games and game_detail
     # #total played_hours is defined as rank
