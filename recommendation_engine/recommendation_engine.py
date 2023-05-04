@@ -44,6 +44,11 @@ if __name__ == '__main__':
     df_game_detail.registerTempTable("game_detail")
     df_game_detail.show()
 
+    try:
+        spark.sql("SELECT * FROM game_detail")
+    except:
+        pass
+
     # rdd = spark.sparkContext.parallelize(result)
     #
     # userOwnedGameDf = spark.read.json(rdd)
