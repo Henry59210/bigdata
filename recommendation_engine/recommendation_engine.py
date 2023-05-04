@@ -172,7 +172,7 @@ if __name__ == '__main__':
                                   host='localhost',
                                   database='wtf')
     df_global_popular_games.show()
-
+    #
     # # 有个中间数据型要先写入json
     # sample_recommended = 'sample_result/sample_recommended.json'
     # with open(sample_recommended, 'w') as output_file:
