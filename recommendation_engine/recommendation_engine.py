@@ -83,7 +83,7 @@ if __name__ == '__main__':
         spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
                 (SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
                 FROM (SELECT EXPLODE(games) AS played_games FROM user_owned_games) a) b \
-                GROUP BY game_id ORDER BY play_time DESC LIMIT 10")
+                GROUP BY game_id ORDER BY play_time DESC")
     df_global_popular_games.show()
     df_global_popular_games.registerTempTable('popular_games')
 
