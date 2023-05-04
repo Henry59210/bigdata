@@ -1,3 +1,6 @@
+import json
+
+import mysql
 from pyspark.sql import SparkSession
 from pyspark.mllib.recommendation import ALS
 
@@ -163,6 +166,39 @@ if __name__ == '__main__':
     # print
     try_df_result.sort("rating", ascending=False).show()
 
+
+#     写入MySQL
+    cnx = mysql.connector.connect(user='root', password='111111',
+                                  host='localhost',
+                                  database='wtf')
+    df_global_popular_games.show()
+
+    # # 有个中间数据型要先写入json
+    # sample_recommended = 'sample_result/sample_recommended.json'
+    # with open(sample_recommended, 'w') as output_file:
+    #     for user_idx in range(0, df_user_idx.count()):
+    #         try:
+    #             lst_recommended = [i.product for i in als_model.recommendProducts(user_idx, 10)]
+    #             rank = 1
+    #             for app_id in lst_recommended:
+    #                 dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'rank': rank}
+    #                 json.dump(dict_recommended, output_file)
+    #                 output_file.write('\n')
+    #                 rank += 1
+    #         # some user index may not in the recommendation result since it's been filtered out
+    #         except:
+    #             pass
+    #
+    # df_recommend_result = spark.read.json(sample_recommended)
+    # df_recommend_result.show(20)
+    #
+    # df_recommend_result.registerTempTable('recommend_result')
+    # # 这个df_final_recommend_result要存入MySQL
+    # df_final_recommend_result = spark.sql("SELECT DISTINCT b.user_id, a.rank, c.name, c.header_image, c.steam_appid \
+    #                                         FROM recommend_result a, user_idx b, game_detail c \
+    #                                         WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
+    #                                         ORDER BY b.user_id, a.rank")
+    # df_final_recommend_result.show(20)
 
 
 
