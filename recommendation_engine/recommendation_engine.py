@@ -1,4 +1,3 @@
-
 from pyspark.shell import spark, sc
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, ArrayType
@@ -37,6 +36,8 @@ if __name__ == '__main__':
 
     # user ownd game表格
     spark = SparkSession.builder.appName("games").getOrCreate()
+
+    json_df = spark.read.json("hdfs://localhost:9000/topics/user_owned_games/partition=0/*.json")
 
     rdd = spark.sparkContext.parallelize(result)
 
