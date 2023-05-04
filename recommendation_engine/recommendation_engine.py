@@ -1,6 +1,6 @@
 import json
 
-import mysql.connector
+# import mysql.connector
 from pyspark.sql import SparkSession
 from pyspark.mllib.recommendation import ALS
 
@@ -168,9 +168,9 @@ if __name__ == '__main__':
 
 
 #     写入MySQL
-    cnx = mysql.connector.connect(user='root', password='111111',
-                                  host='localhost',
-                                  database='wtf')
+#     cnx = mysql.connector.connect(user='root', password='111111',
+#                                   host='localhost',
+#                                   database='wtf')
     df_global_popular_games.show()
     #
     # # 有个中间数据型要先写入json
