@@ -84,7 +84,10 @@ if __name__ == '__main__':
     df_user_owned_games.registerTempTable("user_owned_games")
 
     df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json")
-    df_game_detail.registerTempTable("game_detail")
+    df_game_detail.registerTempTable("temp_game_detail")
+    df_valid_game = spark.sql("SELECT * FROM temp_game_detail where _corrupt_record is null")
+    df_valid_game.registerTempTable("game_detail")
+    df_valid_game.show(1)
     # # top 10 games which have longest total played hours
     df_global_popular_games = \
         spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
@@ -206,6 +209,8 @@ if __name__ == '__main__':
 #     但现在这个数据是空的，因为他好像是根据friend_list来实现一个global的rank，但数据量的问题导致这个过程中某个friends表是空的，所以不确定
 df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS name, a.play_time AS rank, b.steam_appid, b.header_image FROM \
                                             temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
+#     哦还有数据清洗操作,睡前才想起来的，加在game_detail那一块的df了，但还没测试过，应该问题不大，但别的df他没做clean，所以不清楚要不要clean的
+
 
 
 
