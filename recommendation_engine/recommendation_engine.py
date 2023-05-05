@@ -142,7 +142,7 @@ if __name__ == '__main__':
     # 有个中间数据型要先写入json
     sample_recommended = 'sample_result/sample_recommended.json'
     # write into json
-    with open(sample_recommended, 'x') as output_file:
+    with open(sample_recommended, 'w') as output_file:
         for user_idx in range(0, df_user_idx.count()):
             try:
                 lst_recommended = [i.product for i in als_model.recommendProducts(user_idx, 10)]
