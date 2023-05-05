@@ -61,6 +61,9 @@ if __name__ == '__main__':
         df_user_recent_games.show()
         df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games['appid'] appid, a.games['playtime_forever'] playtime_forever FROM user_recent_games a \
                                                         JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
+        df_valid_user_recent_games = df_valid_user_recent_games \
+            .selectExpr("user_idx", "explode(appid) as appid", "explode(playtime_forever) as playtime_forever")
+
         print("df_valid_user_recent_games")
         df_valid_user_recent_games.show(10)
         print("f_valid_user_recent_games count: ")
