@@ -120,6 +120,7 @@ if __name__ == '__main__':
     training_rdd.collect()
 
     als_model = ALS.trainImplicit(training_rdd, 10)
+    als_model.save("/home/azureuser/model/als")
     # print out 10 recommendeds product for user of index 0
     result_rating = als_model.recommendProducts(0, 10)
     # print result_rating
