@@ -209,7 +209,7 @@ if __name__ == '__main__':
         "user": "root",
         "password": "111111",
         "driver": 'com.mysql.cj.jdbc.Driver',
-        "createTableColumnTypes": "user_id BIGINT, ranks INT, name VARCHAR(255), header_image VARCHAR(500), steam_appid BIGINT"
+        "createTableColumnTypes": "user_id BIGINT, ranks INT, name VARCHAR(255), header_image VARCHAR(500), steam_appid BIGINT, INDEX personal_recommendation_user_id_ranks_index (user_id, ranks)"
     }
     final_recommend_result_table = 'personal_recommendation'
     df_final_recommend_result.write.jdbc(url=url, mode=mode, properties=df_global_popular_games_properties, table=final_recommend_result_table)
@@ -224,6 +224,7 @@ if __name__ == '__main__':
         "user": "root",
         "password": "111111",
         "driver": 'com.mysql.cj.jdbc.Driver',
+        "createTableColumnTypes": "INDEX popular_games_ranks_index (ranks)"
     }
     df_global_popular_games.write.jdbc(url=url, mode=mode, properties=df_global_popular_games_properties, table=global_popular_games_table)
 #     哦还有数据清洗操作,睡前才想起来的，加在game_detail那一块的df了，但还没测试过，应该问题不大，但别的df他没做clean，所以不清楚要不要clean的
