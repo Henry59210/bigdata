@@ -59,7 +59,7 @@ if __name__ == '__main__':
         df_user_recent_games = spark.read.json(user_recent_games_file)
         df_user_recent_games.registerTempTable("user_recent_games")
         df_user_recent_games.show()
-        df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
+        df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games['appid'] appid, a.games['playtime_forever'] playtime_forever FROM user_recent_games a \
                                                         JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
         print("df_valid_user_recent_games")
         df_valid_user_recent_games.show(10)
