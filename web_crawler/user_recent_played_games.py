@@ -3,7 +3,7 @@ import sys
 import requests
 from pyspark.mllib.recommendation import MatrixFactorizationModel
 from pyspark.sql import SparkSession
-from pyspark.ml.recommendation import ALS
+from pyspark.mllib.recommendation import ALS
 
 key = '8F8BBCEDF2B6E75EDC1F65A9DADB9A0E'
 url = 'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=' + key + '&steamid='
