@@ -40,7 +40,7 @@ if __name__ == '__main__':
         user_id = sys.argv[1]
         user_recent_played_games = get_user_recent_played_games(user_id)
         spark = SparkSession.builder.appName("games").getOrCreate()
-        model = MatrixFactorizationModel.load(spark.sparkContext, 'als')
+        model = MatrixFactorizationModel.load(spark.sparkContext, '/home/azureuser/model/als')
         df_user_recent_games = spark.read.json(user_recent_played_games)
         df_user_recent_games.registerTempTable("user_recent_games")
         df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
