@@ -73,4 +73,4 @@ if __name__ == '__main__':
 
         # Predict the ratings for the testing data using the loaded ALS model
         predictions = model.predictAll(testing_rdd).map(lambda r: ((r[0], r[1]), r[2]))
-        print(predictions.collect())
+        spark.createDataFrame(predictions).show()
