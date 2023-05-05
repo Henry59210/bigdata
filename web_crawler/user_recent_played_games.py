@@ -50,13 +50,13 @@ def append(df):
     dump_file(user_idx_file, user_idx_str)
     dump_file(user_recent_games_file, user_recent_played_games)
     df_user_idx_append = spark.read.json(user_idx_file)
-    df_user_idx_append.registerTempTable("user_idx")
+    df_user_idx_append.registerTempTable("user_idx1")
     df_user_idx_append.show()
     df_user_recent_games_append = spark.read.json(user_recent_games_file)
-    df_user_recent_games_append.registerTempTable("user_recent_games")
+    df_user_recent_games_append.registerTempTable("user_recent_games1")
     df_user_recent_games_append.show()
-    df_valid_user_recent_games_append = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
-                                                    JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
+    df_valid_user_recent_games_append = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games1 a \
+                                                    JOIN user_idx1 b ON b.user_id = a.steamid WHERE a.total_count != 0")
     return df.union(df_valid_user_recent_games_append)
 
 
