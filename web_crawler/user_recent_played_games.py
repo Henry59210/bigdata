@@ -107,7 +107,7 @@ if __name__ == '__main__':
         # 有个中间数据型要先写入json
         sample_recommended = 'sample_recommended.json'
         # 这里我看x应该是可以写入default创建文件的，但执行的时候报错没有这个文件，新建一个应该就行问题不大，看你们要不要试一下直接存MySQL，这段我看不太懂
-        with open(sample_recommended, 'x') as output_file:
+        with open(sample_recommended) as output_file:
             for user_idx in range(0, df_user_idx.count()):
                 try:
                     lst_recommended = [i.product for i in als_model.recommendProducts(user_idx, 10)]
@@ -126,6 +126,10 @@ if __name__ == '__main__':
         df_recommend_result.show(20)
         print("df_recommend_result count: ")
         print(df_recommend_result.count())
+
+
+        df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json").dropDuplicates()
+        df_game_detail.registerTempTable("game_detail")
 
         df_recommend_result.registerTempTable('recommend_result')
         # 这个df_final_recommend_result要存入MySQL(这条还没测试不清楚，因为上面那个存json的文件暂时不确定要不要这么写)
