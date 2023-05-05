@@ -77,12 +77,15 @@ if __name__ == '__main__':
     print(df_friend_list.count())
     df_friend_list.registerTempTable('user_friend_list')
     # find out the total playtime of all friends for each game
-    spark.sql("SELECT game_id, SUM(playtime_forever) AS play_time FROM \
+    temp_local_popular_games = spark.sql("SELECT game_id, SUM(playtime_forever) AS play_time FROM \
                 (SELECT games['appid'] AS game_id, games['playtime_forever'] AS playtime_forever FROM \
                 (SELECT a.steamid, EXPLODE(b.games) AS games \
                 FROM user_friend_list a, user_owned_games b WHERE a.steamid = b.steamid) c) d \
-                GROUP BY game_id ORDER BY play_time DESC LIMIT 10") \
-        .registerTempTable('temp_local_popular_games')
+                GROUP BY game_id ORDER BY play_time DESC LIMIT 10")
+    temp_local_popular_games.show()
+    temp_local_popular_games.registerTempTable('temp_local_popular_games')
+    print("temp_local_popular_games count: ")
+    print(temp_local_popular_games.count())
 
     df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS game_name, a.play_time FROM \
                                             temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
