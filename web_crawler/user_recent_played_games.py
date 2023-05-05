@@ -73,5 +73,6 @@ if __name__ == '__main__':
         print(testing_rdd.collect())
 
         # Predict the ratings for the testing data using the loaded ALS model
-        predictions = model.predictAll(testing_rdd)
+        model.transform(testing_rdd)
+        predictions = model.recommendProductsForUsers(user_id)
         print(predictions.collect())
