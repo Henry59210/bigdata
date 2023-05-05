@@ -208,7 +208,7 @@ if __name__ == '__main__':
     properties = {
         "user": "root",
         "password": "111111",
-        "driver": 'com.mysql.jdbc.Driver'
+        "driver": 'com.mysql.cj.jdbc.Driver'
     }
     final_recommend_result_table = 'personal_recommendation'
     df_final_recommend_result.write.jdbc(url=url, mode=mode, properties=properties, table=final_recommend_result_table)
