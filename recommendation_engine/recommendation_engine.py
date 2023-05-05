@@ -124,11 +124,7 @@ if __name__ == '__main__':
     als_model = ALS.trainImplicit(training_rdd, 10)
 
 
-    from pyspark import SparkConf, SparkContext
-
-    conf = SparkConf().setAppName("MyApp").setMaster("local[*]")
-    sc = SparkContext(conf=conf)
-    als_model.save(sc, "/home/azureuser/model/als")
+    als_model.save(spark.sparkContext, "/home/azureuser/model/als")
     # print out 10 recommendeds product for user of index 0
     result_rating = als_model.recommendProducts(0, 10)
     # print result_rating
