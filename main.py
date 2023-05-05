@@ -5,7 +5,7 @@ from threading import Thread
 import requests
 from kafka_utils import producer
 
-from web_crawler.steam_data import get_online_users, dump_user_id, get_app_id_list, get_game_detail, dump_user_info
+from web_crawler.steam_data import get_users, dump_user_id, get_app_id_list, get_game_detail, dump_user_info
 
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     user_ids = []
     for idx in range(1, member_list_page_no + 1):
         print("Member List " + str(idx))
-        get_online_users(idx, user_ids)
+        get_users(idx, user_ids)
     print("Total online users found:")
     print(len(user_ids))
 

@@ -29,7 +29,7 @@ def get_user_id(user_profile, user_ids):
                     continue
 
 
-def get_online_users(member_list_no, user_ids):
+def get_users(member_list_no, user_ids):
     url = 'https://steamcommunity.com/games/steam/members?p=' + str(member_list_no)
     header = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -45,7 +45,7 @@ def get_online_users(member_list_no, user_ids):
     # search profile of users who are online/in-game
     all_users = soup.find_all("div",
                               onclick=re.compile("top\.location\.href='https:\/\/steamcommunity\.com\/id\/(\w+)'"),
-                              class_=re.compile("online|in-game"))
+                              class_=re.compile("online|in-game|offline"))
 
     # get user names
     for user in all_users:
