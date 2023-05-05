@@ -3,7 +3,7 @@ import sys
 import requests
 from pyspark.mllib.recommendation import MatrixFactorizationModel
 from pyspark.sql import SparkSession
-from pyspark.mllib.recommendation import ALS
+from pyspark.ml.recommendation import ALS
 
 key = '8F8BBCEDF2B6E75EDC1F65A9DADB9A0E'
 url = 'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=' + key + '&steamid='
@@ -66,13 +66,16 @@ if __name__ == '__main__':
         print("f_valid_user_recent_games count: ")
         print(df_valid_user_recent_games.count())
 
+        als = ALS()
+
         # map and filter out the games whose playtime is 0
         testing_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
             .map(lambda x_y: (x_y[0], x_y[1].appid, x_y[1].playtime_forever)) \
             .filter(lambda x_y_z: x_y_z[2] > 0)
         print(testing_rdd.collect())
+        model1 = als.fit(df_valid_user_recent_games)
 
         # Predict the ratings for the testing data using the loaded ALS model
-        model.transform(testing_rdd)
-        predictions = model.recommendProductsForUsers(user_id)
+        model1.transform(df_valid_user_recent_games)
+        predictions = model1.recommendProductsForUsers(user_id)
         print(predictions.collect())
