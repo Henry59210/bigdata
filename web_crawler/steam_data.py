@@ -57,13 +57,13 @@ def get_online_users(member_list_no, user_ids):
 
 # step2: write id in file
 def dump_user_id(user_ids, user_out_file, user_id_content):
-    with open(user_out_file, 'w') as f:
-        for idx in range(0, len(user_ids)):
-            user_id_idx = {'user_idx': idx, 'user_id': user_ids[idx]}
-            json.dump(user_id_idx, f)
-            push_message('user_idx', json.dumps(user_id_idx))
+    # with open(user_out_file, 'w') as f:
+    for idx in range(0, len(user_ids)):
+        user_id_idx = {'user_idx': idx, 'user_id': user_ids[idx]}
+        # json.dump(user_id_idx, f)
+        push_message('user_idx', json.dumps(user_id_idx))
             # user_id_content.append(user_id_idx)
-            f.write('\n')
+            # f.write('\n')
 
 
 # step3: Get all games info
@@ -155,16 +155,16 @@ def process_json_obj(resp, user_out_file, user_id):
 
 def dump_user_info(topic, url, user_ids, user_out_file):
     user_info_content = []
-    with open(user_out_file, 'w') as f:
-        for user_id in user_ids:
-            url_temp = url + str(user_id)
-            print(url_temp)
-            resp = requests.get(url_temp)
+    # with open(user_out_file, 'w') as f:
+    for user_id in user_ids:
+        url_temp = url + str(user_id)
+        print(url_temp)
+        resp = requests.get(url_temp)
 
-            # resp = requests.head(url_temp)
-            obj = process_json_obj(resp, user_out_file, user_id)
-            user_info_content.append(obj)
-            json.dump(obj, f)
-            push_message(topic, json.dumps(obj))
-            f.write('\n')
+        # resp = requests.head(url_temp)
+        obj = process_json_obj(resp, user_out_file, user_id)
+        user_info_content.append(obj)
+        # json.dump(obj, f)
+        push_message(topic, json.dumps(obj))
+        # f.write('\n')
     return user_info_content

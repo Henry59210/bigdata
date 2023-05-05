@@ -29,12 +29,15 @@ if __name__ == '__main__':
     print(user_id_content)
     # producer.push_message('user_idx', user_id_content)
 
-    # step3: Get all games info
-    app_id_list = get_app_id_list()
-    print("total apps: " + str(len(app_id_list)))
 
-    game_detail_content = []
-    get_game_detail(app_id_list, 1000, "data/game_detail.json", game_detail_content)
+
+    # 游戏信息获取
+    # step3: Get all games info
+    # app_id_list = get_app_id_list()
+    # print("total apps: " + str(len(app_id_list)))
+
+    # game_detail_content = []
+    # get_game_detail(app_id_list, 1000, "data/game_detail.json", game_detail_content)
 
     # step 4: Get user related info
 
