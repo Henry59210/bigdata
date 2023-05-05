@@ -84,10 +84,10 @@ if __name__ == '__main__':
     df_user_owned_games.registerTempTable("user_owned_games")
 
     df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json")
-    df_game_detail.registerTempTable("temp_game_detail")
-    df_valid_game = spark.sql("SELECT * FROM temp_game_detail where _corrupt_record is null")
-    df_valid_game.registerTempTable("game_detail")
-    df_valid_game.show(1)
+    df_game_detail.registerTempTable("game_detail")
+    # df_valid_game = spark.sql("SELECT * FROM temp_game_detail where _corrupt_record is null")
+    # df_valid_game.registerTempTable("game_detail")
+    # df_valid_game.show(1)
     # # top 10 games which have longest total played hours
     df_global_popular_games = \
         spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
