@@ -29,6 +29,8 @@ if __name__ == '__main__':
 
     df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json").dropDuplicates()
     df_game_detail.registerTempTable("game_detail")
+    print("df_game_detail count:")
+    print(df_game_detail.count())
 
 
     print("top 10 games which have longest total played hours")
@@ -68,7 +70,7 @@ if __name__ == '__main__':
     # #find his/her friends
     df_user_friend_list = spark.read.json("hdfs://localhost:9000/topics/user_friend_list/partition=0/*.json").dropDuplicates()
     df_user_friend_list.registerTempTable("friend_list")
-    sample_user = '76561198064744540'
+    sample_user = '76561197972495328'
     df_friend_list = spark.sql("SELECT friends['steamid'] AS steamid FROM \
                 (SELECT EXPLODE(friends) AS friends FROM friend_list WHERE steamid = %s) a" % sample_user)
     print("find his/her friends")
@@ -170,7 +172,7 @@ if __name__ == '__main__':
     df_final_recommend_result = spark.sql("SELECT DISTINCT b.user_id, a.ranks, c.name, c.header_image, c.steam_appid \
                                             FROM recommend_result a, user_idx b, game_detail c \
                                             WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
-                                            ORDER BY b.user_id, a.ranks")
+                                            ORDER BY b.user_id, a.ranks").dropDuplicates()
     print("final_recommend_result")
     df_final_recommend_result.show(20)
     print("df_final_recommend_result count: ")
