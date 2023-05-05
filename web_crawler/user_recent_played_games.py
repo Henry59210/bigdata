@@ -80,7 +80,23 @@ if __name__ == '__main__':
         # print(testing_rdd.collect())
         model1 = als.fit(df_valid_user_recent_games)
 
+        user_id = 76561197965417975
+        user_idx_str = '{"user_idx": 1, "user_id": ' + user_id + '}'
+        dump_file(user_idx_file, user_idx_str)
+        dump_file(user_recent_games_file, user_recent_played_games)
+        df_user_idx = spark.read.json(user_idx_file)
+        df_user_idx.registerTempTable("user_idx")
+        df_user_idx.show()
+        df_user_recent_games = spark.read.json(user_recent_games_file)
+        df_user_recent_games.registerTempTable("user_recent_games")
+        df_user_recent_games.show()
+        df_valid_user_recent_games = spark.sql("SELECT b.user_idx, g.appid, g.playtime_forever \
+                                                        FROM user_recent_games a \
+                                                        JOIN user_idx b ON b.user_id = a.steamid \
+                                                        LATERAL VIEW explode(a.games) exploded_games AS g \
+                                                        WHERE a.total_count != 0") \
+            .select("user_idx", "appid", "playtime_forever")
         # Predict the ratings for the testing data using the loaded ALS model
         model1.transform(df_valid_user_recent_games)
-        predictions = model1.recommendProductsForUsers(user_id)
+        predictions = model1.recommendForAllUsers()
         print(predictions.collect())
