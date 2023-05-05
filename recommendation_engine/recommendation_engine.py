@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # #find his/her friends
     df_user_friend_list = spark.read.json("hdfs://localhost:9000/topics/user_friend_list/partition=0/*.json").dropDuplicates()
     df_user_friend_list.registerTempTable("friend_list")
-    sample_user = '76561197972495328'
+    sample_user = '76561197960315617'
     df_friend_list = spark.sql("SELECT friends['steamid'] AS steamid FROM \
                 (SELECT EXPLODE(friends) AS friends FROM friend_list WHERE steamid = %s) a" % sample_user)
     print("find his/her friends")
