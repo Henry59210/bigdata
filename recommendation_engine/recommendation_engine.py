@@ -173,7 +173,7 @@ if __name__ == '__main__':
 #     写入MySQL
 #     cnx = mysql.connector.connect(user='root', password='111111',
 #                                   host='localhost',
-#                                   database='wtf')
+#                                   database='big_data')
 
     #
     # 有个中间数据型要先写入json
@@ -203,12 +203,23 @@ if __name__ == '__main__':
                                             WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
                                             ORDER BY b.user_id, a.ranks")
     df_final_recommend_result.show(20)
+    url = 'jdbc:mysql://20.2.240.50/big_data?serverTimezone=Asia/Shanghai'
+    mode = 'overwrite'
+    properties = {
+        "user": "root",
+        "password": "111111",
+        "driver": 'com.mysql.jdbc.Driver'
+    }
+    final_recommend_result_table = 'personal_recommendation'
+    df_final_recommend_result.write.jdbc(url=url, mode=mode, properties=properties, table=final_recommend_result_table)
 
-#     现在的问题有两个，一个是存到MySQL里面，这个我没看到表先没搞；另一个是样例中store the recommendation results to aws rds这一块，他存了个df_global_popular_games表，但这个表
-#     你仔细看会发现这玩意...和他下面的执行结果结构不一样，所以不知道他这一步是什么东西，如果搞不定我觉得可以忽略掉这个表，如果要保留，我猜是这么写的，game_detail里确实有这两个参数
-#     但现在这个数据是空的，因为他好像是根据friend_list来实现一个global的rank，但数据量的问题导致这个过程中某个friends表是空的，所以不确定
-df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS name, a.play_time AS rank, b.steam_appid, b.header_image FROM \
-                                            temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
+    #     现在的问题有两个，一个是存到MySQL里面，这个我没看到表先没搞；另一个是样例中store the recommendation results to aws rds这一块，他存了个df_global_popular_games表，但这个表
+    #     你仔细看会发现这玩意...和他下面的执行结果结构不一样，所以不知道他这一步是什么东西，如果搞不定我觉得可以忽略掉这个表，如果要保留，我猜是这么写的，game_detail里确实有这两个参数
+    #     但现在这个数据是空的，因为他好像是根据friend_list来实现一个global的rank，但数据量的问题导致这个过程中某个friends表是空的，所以不确定
+    df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS name, a.play_time AS ranks, b.steam_appid, b.header_image FROM \
+                                                temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
+    global_popular_games_table = 'popular_games'
+    df_global_popular_games.jdbc(url=url, mode=mode, properties=properties, table=global_popular_games_table)
 #     哦还有数据清洗操作,睡前才想起来的，加在game_detail那一块的df了，但还没测试过，应该问题不大，但别的df他没做clean，所以不清楚要不要clean的
 
 
