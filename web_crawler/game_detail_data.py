@@ -1,4 +1,4 @@
-from web_crawler.steam_data import get_app_id_list, get_game_detail
+from steam_data import get_game_detail, get_app_id_list
 
 if __name__ == '__main__':
     # 游戏信息获取
