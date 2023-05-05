@@ -173,7 +173,7 @@ if __name__ == '__main__':
     df_final_recommend_result = spark.sql("SELECT DISTINCT b.user_id, a.ranks, c.name, c.header_image, c.steam_appid \
                                             FROM recommend_result a, user_idx b, game_detail c \
                                             WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
-                                            ORDER BY b.user_id, a.ranks").dropDuplicates()
+                                            ORDER BY b.user_id, a.ranks").dropDuplicates().dropDuplicates(['user_id', 'name'])
     print("final_recommend_result")
     df_final_recommend_result.show(20)
     print("df_final_recommend_result count: ")
