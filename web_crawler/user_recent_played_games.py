@@ -66,7 +66,7 @@ if __name__ == '__main__':
         print("f_valid_user_recent_games count: ")
         print(df_valid_user_recent_games.count())
 
-        als = ALS()
+        als = ALS(userCol='user_idx', itemCol='appid', ratingCol='playtime_forever')
 
         # map and filter out the games whose playtime is 0
         # testing_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
