@@ -6,7 +6,7 @@ from kafka.errors import KafkaError
 
 def get_message(topic):
     # 创建一个 Kafka 消费者
-    consumer = KafkaConsumer(topic, bootstrap_servers=['20.2.240.50:9092'])
+    consumer = KafkaConsumer(topic, bootstrap_servers=['20.2.129.187:9092'])
 
     # 从 Kafka 主题中拉取消息
     for message in consumer:

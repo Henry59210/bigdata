@@ -5,14 +5,14 @@ from kafka.errors import KafkaError
 
 
 def push_message(topic, content):
-    producer = KafkaProducer(bootstrap_servers=['20.2.240.50:9092'])
+    producer = KafkaProducer(bootstrap_servers=['20.2.129.187:9092'])
     producer.send(topic, value=str(content).encode('utf-8'))
     producer.close()
 
 
 if __name__ == '__main__':
     # Kafka集群地址
-    bootstrap_servers = ['20.2.240.50:9092']
+    bootstrap_servers = ['20.2.129.187:9092']
 
 
     # 创建Kafka Producer

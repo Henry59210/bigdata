@@ -203,7 +203,7 @@ if __name__ == '__main__':
                                             WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
                                             ORDER BY b.user_id, a.ranks")
     df_final_recommend_result.show(20)
-    url = 'jdbc:mysql://20.2.240.50/big_data?serverTimezone=Asia/Shanghai'
+    url = 'jdbc:mysql://20.2.129.187/big_data?serverTimezone=Asia/Shanghai'
     mode = 'overwrite'
     df_global_popular_games_properties = {
         "user": "root",
