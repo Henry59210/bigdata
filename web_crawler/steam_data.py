@@ -96,9 +96,9 @@ def get_game_detail(app_id_list, num, game_detail_out_file, game_detail_content)
         'Accept-Encoding': 'gzip, deflate, sdch',
         'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2'}
     with open(game_detail_out_file, 'w') as f:
-        for idx in range(num):
+        for i in app_id_list:
 
-            url_temp = url + str(app_id_list[idx])
+            url_temp = url + str(i)
             time.sleep(.100)  # sleep 100ms
             resp = requests.get(url_temp, header)
 
@@ -111,8 +111,8 @@ def get_game_detail(app_id_list, num, game_detail_out_file, game_detail_content)
                         push_message('game_detail', json.dumps(obj[key]["data"]))
                         f.write('\n')
             else:
-                print(idx)
-                print(app_id_list[idx])
+                # print(idx)
+                print(i)
                 print(obj)
 
 

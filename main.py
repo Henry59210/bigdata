@@ -15,7 +15,7 @@ key = '8F8BBCEDF2B6E75EDC1F65A9DADB9A0E'
 if __name__ == '__main__':
 
     # step 1: get userID
-    member_list_page_no = 5
+    member_list_page_no = 500
     user_ids = []
     for idx in range(1, member_list_page_no + 1):
         print("Member List " + str(idx))
