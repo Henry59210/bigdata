@@ -37,6 +37,7 @@ def process_json_obj(resp, user_id):
 def dump_file(output_path, obj):
     with open(output_path, 'w') as f:
         json.dump(obj, f)
+        f.write('\n')
 
 
 if __name__ == '__main__':
