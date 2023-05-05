@@ -80,7 +80,7 @@ if __name__ == '__main__':
         # print(testing_rdd.collect())
         model1 = als.fit(df_valid_user_recent_games)
 
-        user_id = 76561197965417975
+        user_id = '76561197965417975'
         user_idx_str = '{"user_idx": 1, "user_id": ' + user_id + '}'
         dump_file(user_idx_file, user_idx_str)
         dump_file(user_recent_games_file, user_recent_played_games)
