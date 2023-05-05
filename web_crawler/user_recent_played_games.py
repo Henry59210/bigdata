@@ -98,5 +98,5 @@ if __name__ == '__main__':
             .select("user_idx", "appid", "playtime_forever")
         # Predict the ratings for the testing data using the loaded ALS model
         model1.transform(df_valid_user_recent_games)
-        predictions = model1.recommendForAllUsers()
+        predictions = model1.recommendForAllUsers(1)
         print(predictions.collect())
