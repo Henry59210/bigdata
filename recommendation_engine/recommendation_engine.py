@@ -49,6 +49,8 @@ if __name__ == '__main__':
     print("df_global_popular_games count:")
     print(df_global_popular_games.count())
 
+    url = 'jdbc:mysql://20.2.129.187/big_data?serverTimezone=Asia/Shanghai'
+    mode = 'overwrite'
     df_global_popular_games_properties = {
         "user": "root",
         "password": "111111",
