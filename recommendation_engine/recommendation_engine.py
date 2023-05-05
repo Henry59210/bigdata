@@ -92,6 +92,7 @@ if __name__ == '__main__':
     # df_valid_game.registerTempTable("game_detail")
     # df_valid_game.show(1)
     # # top 10 games which have longest total played hours
+    print("top 10 games which have longest total played hours")
     df_global_popular_games = \
         spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
                 (SELECT played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever \
@@ -102,6 +103,7 @@ if __name__ == '__main__':
     # total played_hours is defined as ranks
     df_global_popular_games = spark.sql("SELECT b.name AS name, a.play_time AS ranks, b.steam_appid, b.header_image FROM \
                                         popular_games a, game_detail b WHERE a.game_id = b.steam_appid ORDER BY ranks DESC")
+    print("find same app id in popular_games and game_detail")
     df_global_popular_games.show()
 
     # df_global_popular_games = df_game_detail.join(df_global_popular_games, df_game_detail.steam_appid == df_global_popular_games.game_id).select(df_game_detail.name.alias('name'), df_global_popular_games.play_time.alias("ranks"), df_game_detail.steam_appid, df_game_detail.header_image).orderBy("ranks", ascending=False)
@@ -115,6 +117,7 @@ if __name__ == '__main__':
     sample_user = '76561198064744540'
     df_friend_list = spark.sql("SELECT friends['steamid'] AS steamid FROM \
                 (SELECT EXPLODE(friends) AS friends FROM friend_list WHERE steamid = %s) a" % sample_user)
+    print("find his/her friends")
     df_friend_list.show(10)
     df_friend_list.registerTempTable('user_friend_list')
     # find out the total playtime of all friends for each game
@@ -127,6 +130,7 @@ if __name__ == '__main__':
 
     df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS game_name, a.play_time FROM \
                                             temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
+    print("find out the total playtime of all friends for each game")
     df_global_popular_games.show()
 
 
@@ -156,6 +160,7 @@ if __name__ == '__main__':
     df_user_idx.registerTempTable('user_idx')
     df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
                                                 JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
+    print("df_valid_user_recent_games")
     df_valid_user_recent_games.show(10)
 
     # map and filter out the games whose playtime is 0
@@ -170,6 +175,7 @@ if __name__ == '__main__':
     # print result_rating
     try_df_result = spark.createDataFrame(result_rating)
     # print
+    print("10 recommendeds product for user of index 0")
     try_df_result.sort("rating", ascending=False).show()
 
 
@@ -197,6 +203,7 @@ if __name__ == '__main__':
                 pass
 
     df_recommend_result = spark.read.json(sample_recommended)
+    print("sample_result/sample_recommended.json 临时文件表")
     df_recommend_result.show(20)
 
     df_recommend_result.registerTempTable('recommend_result')
@@ -205,6 +212,7 @@ if __name__ == '__main__':
                                             FROM recommend_result a, user_idx b, game_detail c \
                                             WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
                                             ORDER BY b.user_id, a.ranks")
+    print("final_recommend_result")
     df_final_recommend_result.show(20)
     url = 'jdbc:mysql://20.2.129.187/big_data?serverTimezone=Asia/Shanghai'
     mode = 'overwrite'
