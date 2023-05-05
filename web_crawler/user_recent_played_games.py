@@ -59,20 +59,20 @@ if __name__ == '__main__':
         df_user_recent_games = spark.read.json(user_recent_games_file)
         df_user_recent_games.registerTempTable("user_recent_games")
         df_user_recent_games.show()
-        df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
+        df_valid_user_recent_games = spark.sql("SELECT b.user_idx, played_games['appid'] AS game_id, played_games['playtime_forever'] AS playtime_forever FROM (SELECT EXPLODE(games) AS played_games FROM user_recent_games) a \
                                                         JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
         print("df_valid_user_recent_games")
         df_valid_user_recent_games.show(10)
         print("f_valid_user_recent_games count: ")
         print(df_valid_user_recent_games.count())
 
-        als = ALS()
+        als = ALS(userCol="user_idx", itemCol="appid", ratingCol='playtime_forever')
 
         # map and filter out the games whose playtime is 0
-        testing_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
-            .map(lambda x_y: (x_y[0], x_y[1].appid, x_y[1].playtime_forever)) \
-            .filter(lambda x_y_z: x_y_z[2] > 0)
-        print(testing_rdd.collect())
+        # testing_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
+        #     .map(lambda x_y: (x_y[0], x_y[1].appid, x_y[1].playtime_forever)) \
+        #     .filter(lambda x_y_z: x_y_z[2] > 0)
+        # print(testing_rdd.collect())
         model1 = als.fit(df_valid_user_recent_games)
 
         # Predict the ratings for the testing data using the loaded ALS model
