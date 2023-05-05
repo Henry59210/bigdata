@@ -219,7 +219,7 @@ if __name__ == '__main__':
     df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS name, a.play_time AS ranks, b.steam_appid, b.header_image FROM \
                                                 temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
     global_popular_games_table = 'popular_games'
-    df_global_popular_games.jdbc(url=url, mode=mode, properties=properties, table=global_popular_games_table)
+    df_global_popular_games.write.jdbc(url=url, mode=mode, properties=properties, table=global_popular_games_table)
 #     哦还有数据清洗操作,睡前才想起来的，加在game_detail那一块的df了，但还没测试过，应该问题不大，但别的df他没做clean，所以不清楚要不要clean的
 
 
