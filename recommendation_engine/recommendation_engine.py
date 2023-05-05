@@ -209,7 +209,7 @@ if __name__ == '__main__':
         "user": "root",
         "password": "111111",
         "driver": 'com.mysql.cj.jdbc.Driver',
-        "createTableColumnTypes": "user_id BIGINT UNSIGNED, ranks INT, name TEXT, header_image TEXT, steam_appid BIGINT"
+        "createTableColumnTypes": "user_id BIGINT, ranks INT, name TEXT, header_image TEXT, steam_appid BIGINT"
     }
     final_recommend_result_table = 'personal_recommendation'
     df_final_recommend_result.write.jdbc(url=url, mode=mode, properties=df_global_popular_games_properties, table=final_recommend_result_table)
