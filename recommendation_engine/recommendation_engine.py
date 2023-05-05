@@ -209,7 +209,6 @@ if __name__ == '__main__':
         "user": "root",
         "password": "111111",
         "driver": 'com.mysql.cj.jdbc.Driver',
-        "createTableColumnTypes": "user_id BIGINT, ranks INT, name VARCHAR(255), header_image VARCHAR(500), steam_appid BIGINT, INDEX personal_recommendation_user_id_ranks_index (user_id, ranks)",
         "truncate": 'true'
     }
     final_recommend_result_table = 'personal_recommendation'
