@@ -68,8 +68,8 @@ if __name__ == '__main__':
 
         # map and filter out the games whose playtime is 0
         testing_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
-            .map(lambda x_y: (x_y[0], x_y[1].appid, x_y[1].playtime_forever)) \
-            .filter(lambda x_y_z: x_y_z[2] > 0)
+            .map(lambda x_y: (x_y[0], x_y[1].appid)) \
+            .distinct()
 
         # Predict the ratings for the testing data using the loaded ALS model
         predictions = model.predictAll(testing_rdd).map(lambda r: ((r[0], r[1]), r[2]))
