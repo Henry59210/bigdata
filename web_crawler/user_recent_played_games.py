@@ -31,7 +31,7 @@ def process_json_obj(resp, user_id):
             obj = {'steamid': user_id, 'total_count': obj['total_count'], 'games': []}
         else:
             obj = {'steamid': user_id, 'total_count': -1, 'games': []}
-    return obj
+    return json.dump(obj)
 
 
 def dump_file(output_path, obj):
