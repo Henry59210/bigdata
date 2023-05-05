@@ -36,7 +36,7 @@ def process_json_obj(resp, user_id):
 
 def dump_file(output_path, obj):
     with open(output_path, 'w') as f:
-        json.dump(obj, f)
+        f.write(obj)
         f.write('\n')
 
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         user_recent_played_games = get_user_recent_played_games(user_id)
         spark = SparkSession.builder.appName("games").getOrCreate()
         model = MatrixFactorizationModel.load(spark.sparkContext, '/home/azureuser/model/als')
-        user_idx_str = '{\"user_idx\": 0, \"user_id\": ' + user_id + '}'
+        user_idx_str = '{"user_idx": 0, "user_id": ' + user_id + '}'
         dump_file(user_idx_file, user_idx_str)
         dump_file(user_recent_games_file, user_recent_played_games)
         df_user_idx = spark.read.json(user_idx_file)
