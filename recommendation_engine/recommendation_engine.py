@@ -80,11 +80,14 @@ if __name__ == '__main__':
     # User
     # Owned
     # Games
-    df_user_owned_games = spark.read.json("hdfs://localhost:9000/topics/user_owned_games/partition=0/*.json")
+    df_user_owned_games = spark.read.json("hdfs://localhost:9000/topics/user_owned_games/partition=0/*.json").dropDuplicates()
     df_user_owned_games.registerTempTable("user_owned_games")
 
-    df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json")
+    df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json").dropDuplicates()
     df_game_detail.registerTempTable("game_detail")
+
+
+    # 去重
     # df_valid_game = spark.sql("SELECT * FROM temp_game_detail where _corrupt_record is null")
     # df_valid_game.registerTempTable("game_detail")
     # df_valid_game.show(1)
@@ -107,7 +110,7 @@ if __name__ == '__main__':
     # #Local
     # Popularity
     # #find his/her friends
-    df_user_friend_list = spark.read.json("hdfs://localhost:9000/topics/user_friend_list/partition=0/*.json")
+    df_user_friend_list = spark.read.json("hdfs://localhost:9000/topics/user_friend_list/partition=0/*.json").dropDuplicates()
     df_user_friend_list.registerTempTable("friend_list")
     sample_user = '76561198064744540'
     df_friend_list = spark.sql("SELECT friends['steamid'] AS steamid FROM \
@@ -144,12 +147,12 @@ if __name__ == '__main__':
     # Filtering
     # Recommendation
     # System
-    df_user_recent_games = spark.read.json("hdfs://localhost:9000/topics/user_recently_played_games/partition=0/*.json")
+    df_user_recent_games = spark.read.json("hdfs://localhost:9000/topics/user_recently_played_games/partition=0/*.json").dropDuplicates()
     df_user_recent_games.registerTempTable("user_recent_games")
     df_valid_user_recent_games = spark.sql("SELECT * FROM user_recent_games where total_count != 0")
     df_valid_user_recent_games.show(1)
 
-    df_user_idx = spark.read.json("hdfs://localhost:9000/topics/user_idx/partition=0/*.json")
+    df_user_idx = spark.read.json("hdfs://localhost:9000/topics/user_idx/partition=0/*.json").dropDuplicates()
     df_user_idx.registerTempTable('user_idx')
     df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
                                                 JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
