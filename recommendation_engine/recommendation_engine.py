@@ -205,14 +205,15 @@ if __name__ == '__main__':
     df_final_recommend_result.show(20)
     url = 'jdbc:mysql://20.2.240.50/big_data?serverTimezone=Asia/Shanghai'
     mode = 'overwrite'
-    properties = {
+    df_global_popular_games_properties = {
         "user": "root",
         "password": "111111",
         "driver": 'com.mysql.cj.jdbc.Driver',
+        "createTableColumnTypes": "user_id BIGINT, ranks INT, name VARCHAR(255), header_image VARCHAR(500), steam_appid BIGINT, INDEX personal_recommendation_user_id_ranks_index (user_id, ranks)",
         "truncate": 'true'
     }
     final_recommend_result_table = 'personal_recommendation'
-    df_final_recommend_result.write.jdbc(url=url, mode=mode, properties=properties, table=final_recommend_result_table)
+    df_final_recommend_result.write.jdbc(url=url, mode=mode, properties=df_global_popular_games_properties, table=final_recommend_result_table)
 
     #     现在的问题有两个，一个是存到MySQL里面，这个我没看到表先没搞；另一个是样例中store the recommendation results to aws rds这一块，他存了个df_global_popular_games表，但这个表
     #     你仔细看会发现这玩意...和他下面的执行结果结构不一样，所以不知道他这一步是什么东西，如果搞不定我觉得可以忽略掉这个表，如果要保留，我猜是这么写的，game_detail里确实有这两个参数
@@ -220,7 +221,14 @@ if __name__ == '__main__':
     df_global_popular_games = spark.sql("SELECT DISTINCT b.name AS name, a.play_time AS ranks, b.steam_appid, b.header_image FROM \
                                                 temp_local_popular_games a, game_detail b WHERE a.game_id = b.steam_appid")
     global_popular_games_table = 'popular_games'
-    df_global_popular_games.write.jdbc(url=url, mode=mode, properties=properties, table=global_popular_games_table)
+    df_global_popular_games_properties = {
+        "user": "root",
+        "password": "111111",
+        "driver": 'com.mysql.cj.jdbc.Driver',
+        "createTableColumnTypes": "INDEX popular_games_ranks_index (ranks)",
+        "truncate": 'true'
+    }
+    df_global_popular_games.write.jdbc(url=url, mode=mode, properties=df_global_popular_games_properties, table=global_popular_games_table)
 #     哦还有数据清洗操作,睡前才想起来的，加在game_detail那一块的df了，但还没测试过，应该问题不大，但别的df他没做clean，所以不清楚要不要clean的
 
 
