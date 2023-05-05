@@ -45,8 +45,10 @@ if __name__ == '__main__':
         user_idx_str='{"user_idx": 0, "user_id": ' + user_id + '}'
         df_user_idx = spark.read.json(spark.sparkContext.parallelize(user_idx_str))
         df_user_idx.registerTempTable("user_idx")
+        df_user_idx.show()
         df_user_recent_games = spark.read.json(spark.sparkContext.parallelize(user_recent_played_games))
         df_user_recent_games.registerTempTable("user_recent_games")
+        df_user_recent_games.show()
         df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
                                                         JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
         print("df_valid_user_recent_games")
