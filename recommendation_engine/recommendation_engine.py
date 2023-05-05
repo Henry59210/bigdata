@@ -18,7 +18,10 @@ def get_hdfs_dir(topic):
 
 if __name__ == '__main__':
 
-    # user ownd game表格
+    # Load
+    # User
+    # Owned
+    # Games
     spark = SparkSession.builder.appName("games").getOrCreate()
 
     df_user_owned_games = spark.read.json("hdfs://localhost:9000/topics/user_owned_games/partition=0/*.json").dropDuplicates()
@@ -28,11 +31,6 @@ if __name__ == '__main__':
     df_game_detail.registerTempTable("game_detail")
 
 
-    # 去重
-    # df_valid_game = spark.sql("SELECT * FROM temp_game_detail where _corrupt_record is null")
-    # df_valid_game.registerTempTable("game_detail")
-    # df_valid_game.show(1)
-    # # top 10 games which have longest total played hours
     print("top 10 games which have longest total played hours")
     df_global_popular_games = \
         spark.sql("SELECT b.game_id, SUM(b.playtime_forever) AS play_time FROM \
@@ -49,6 +47,7 @@ if __name__ == '__main__':
     print("df_global_popular_games count:")
     print(df_global_popular_games.count())
 
+    #df_global_popular_games写入MySQL
     url = 'jdbc:mysql://20.2.129.187/big_data?serverTimezone=Asia/Shanghai'
     mode = 'overwrite'
     df_global_popular_games_properties = {
@@ -115,7 +114,11 @@ if __name__ == '__main__':
     print("f_valid_user_recent_games count: ")
     print(df_valid_user_recent_games.count())
 
+
+
+    # ALS
     # map and filter out the games whose playtime is 0
+    # training data
     training_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
         .map(lambda x_y: (x_y[0], x_y[1].appid, x_y[1].playtime_forever)) \
         .filter(lambda x_y_z: x_y_z[2] > 0)
@@ -139,7 +142,7 @@ if __name__ == '__main__':
     #
     # 有个中间数据型要先写入json
     sample_recommended = 'sample_result/sample_recommended.json'
-    # 这里我看x应该是可以写入default创建文件的，但执行的时候报错没有这个文件，新建一个应该就行问题不大，看你们要不要试一下直接存MySQL，这段我看不太懂
+    # write into json
     with open(sample_recommended, 'x') as output_file:
         for user_idx in range(0, df_user_idx.count()):
             try:
@@ -161,7 +164,7 @@ if __name__ == '__main__':
     print(df_recommend_result.count())
 
     df_recommend_result.registerTempTable('recommend_result')
-    # 这个df_final_recommend_result要存入MySQL(这条还没测试不清楚，因为上面那个存json的文件暂时不确定要不要这么写)
+    # 这个df_final_recommend_result要存入MySQL
     df_final_recommend_result = spark.sql("SELECT DISTINCT b.user_id, a.ranks, c.name, c.header_image, c.steam_appid \
                                             FROM recommend_result a, user_idx b, game_detail c \
                                             WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
