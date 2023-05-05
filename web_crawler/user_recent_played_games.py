@@ -83,6 +83,7 @@ if __name__ == '__main__':
         user_id = '76561197965417975'
         user_idx_str = '{"user_idx": 1, "user_id": ' + user_id + '}'
         dump_file(user_idx_file, user_idx_str)
+        user_recent_played_games = get_user_recent_played_games(user_id)
         dump_file(user_recent_games_file, user_recent_played_games)
         df_user_idx = spark.read.json(user_idx_file)
         df_user_idx.registerTempTable("user_idx")
