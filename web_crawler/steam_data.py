@@ -96,36 +96,38 @@ def get_game_detail(app_id_list, num, game_detail_out_file, game_detail_content)
         'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2'}
     with open(game_detail_out_file, 'w') as f:
         for i in app_id_list:
+            j = 0
+            while True:
+                try:
+                    url_temp = url + str(i)
+                    time.sleep(.100)  # sleep 100ms
+                    resp = requests.get(url_temp, header)
 
-            try:
-                url_temp = url + str(i)
-                time.sleep(.100)  # sleep 100ms
-                resp = requests.get(url_temp, header)
+                    obj = resp.json()
+                except requests.exceptions.HTTPError as e:
+                    print("HTTP错误", e)
+                except requests.exceptions.ConnectionError as e:
+                    print("连接错误", e)
+                except requests.exceptions.Timeout as e:
+                    print("请求超时", e)
+                except requests.exceptions.RequestException as e:
+                    print("其他错误请求", e)
+                except json.JSONDecodeError as e:
+                    print("JSON解析错误", e)
+                except Exception as e:
+                    print("其他错误", e)
+                if obj is not None:
+                    for key in obj:
 
-                obj = resp.json()
-            except requests.exceptions.HTTPError as e:
-                print("HTTP错误", e)
-            except requests.exceptions.ConnectionError as e:
-                print("连接错误", e)
-            except requests.exceptions.Timeout as e:
-                print("请求超时", e)
-            except requests.exceptions.RequestException as e:
-                print("其他错误请求", e)
-            except json.JSONDecodeError as e:
-                print("JSON解析错误", e)
-            except Exception as e:
-                print("其他错误", e)
-            if obj is not None:
-                for key in obj:
-
-                    if obj[key]["success"] is True:
-                        json.dump(obj[key]["data"], f)
-                        push_message('game_detail', json.dumps(obj[key]["data"]))
-                        f.write('\n')
-            else:
-                # print(idx)
-                print(i)
-                print(obj)
+                        if obj[key]["success"] is True:
+                            json.dump(obj[key]["data"], f)
+                            push_message('game_detail', json.dumps(obj[key]["data"]))
+                            f.write('\n')
+                    break
+                else:
+                    # print(idx)
+                    print("未找到序号为{}，尝试次数{}".format(i, j))
+                    j += 1
 
 
 def process_json_obj(resp, user_out_file, user_id):
