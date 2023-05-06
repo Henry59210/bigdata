@@ -189,6 +189,7 @@ if __name__ == '__main__':
             except:
                 pass
 
+    print("存储完成")
     df_recommend_result = spark.read.json(sample_recommended)
     print("sample_result/sample_recommended.json 临时文件表")
     df_recommend_result.show(20)
