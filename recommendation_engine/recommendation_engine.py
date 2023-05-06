@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     df_user_idx_origin = spark.read.json("hdfs://localhost:9000/topics/user_idx/partition=0/*.json").dropDuplicates().dropDuplicates(['user_id'])
     df_user_idx_origin.registerTempTable('user_idx_origin')
-    df_user_idx = spark.sql("SELECT user_id, ROW_NUMBER() OVER (ORDER BY user_id) AS user_idx FROM user_idx_origin;")
+    df_user_idx = spark.sql("SELECT user_id, ROW_NUMBER() OVER (ORDER BY user_id) - 1 AS user_idx FROM user_idx_origin;")
     df_user_idx.registerTempTable('user_idx')
     df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
                                                 JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
