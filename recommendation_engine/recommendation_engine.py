@@ -202,6 +202,8 @@ if __name__ == '__main__':
                 print(dict_recommended)
                 ranks += 1
         except:
+            print('异常')
+            print(user_idx)
             pass
     print("存储完成，开始读取为dataframe")
     df_recommend_result = spark.createDataFrame(lst_recommended)
