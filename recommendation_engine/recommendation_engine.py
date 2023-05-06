@@ -203,7 +203,7 @@ if __name__ == '__main__':
                 ranks += 1
         except:
             pass
-
+    print("存储完成，开始读取为dataframe")
     df_recommend_result = spark.createDataFrame(lst_recommended)
     df_recommend_result.show()
     print("sample_result/sample_recommended.json 临时文件表")
