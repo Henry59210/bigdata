@@ -98,6 +98,8 @@ def get_game_detail(app_id_list, num, game_detail_out_file, game_detail_content)
         for i in app_id_list:
             j = 0
             while True:
+                current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                print(current_time)
                 try:
                     url_temp = url + str(i)
                     time.sleep(.100)  # sleep 100ms
