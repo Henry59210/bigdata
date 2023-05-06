@@ -148,18 +148,26 @@ if __name__ == '__main__':
 
 
     # 定义一个函数，接受 user_idx 列的值作为参数，并调用 als_model.recommendProducts()
-    def recommend_for_user(user_idx):
+    # def recommend_for_user(user_idx):
+    #     recommendations = als_model.recommendProducts(user_idx, 10)
+    #     return [{'user_idx': user_idx, 'game_id': row.product, 'rank': idx + 1} for idx, row in
+    #             enumerate(recommendations)]
+    #
+    #
+    # # 使用 map() 方法调用 recommend_for_user 函数，并将结果收集为一个列表
+    # recommendations_list = df_user_idx.rdd.flatMap(lambda row: recommend_for_user(row.user_idx)).collect()
+    #
+    # # 将字典列表转换为 DataFrame
+    # df_recommend_result = spark.createDataFrame(recommendations_list)
+    def recommend_for_user(row):
+        user_idx = row.user_idx
         recommendations = als_model.recommendProducts(user_idx, 10)
         return [{'user_idx': user_idx, 'game_id': row.product, 'rank': idx + 1} for idx, row in
                 enumerate(recommendations)]
 
 
-    # 使用 map() 方法调用 recommend_for_user 函数，并将结果收集为一个列表
-    recommendations_list = df_user_idx.rdd.flatMap(lambda row: recommend_for_user(row.user_idx)).collect()
-
-    # 将字典列表转换为 DataFrame
-    df_recommend_result = spark.createDataFrame(recommendations_list)
-
+    recommendations_rdd = df_user_idx.rdd.map(recommend_for_user)
+    recommendations_list = recommendations_rdd.collect()
 
     # #
     # # 有个中间数据型要先写入json
