@@ -157,37 +157,39 @@ if __name__ == '__main__':
     # # 使用 map() 方法调用 recommend_for_user 函数，并将结果收集为一个列表
     # recommendations_list = df_user_idx.rdd.flatMap(lambda row: recommend_for_user(row.user_idx)).collect()
     #
+
+
     # # 将字典列表转换为 DataFrame
     # df_recommend_result = spark.createDataFrame(recommendations_list)
-    def recommend_for_user(row):
-        user_idx = row.user_idx
-        recommendations = als_model.recommendProducts(user_idx, 10)
-        return [{'user_idx': user_idx, 'game_id': row.product, 'rank': idx + 1} for idx, row in
-                enumerate(recommendations)]
+    # def recommend_for_user(row):
+    #     user_idx = row.user_idx
+    #     recommendations = als_model.recommendProducts(user_idx, 10)
+    #     return [{'user_idx': user_idx, 'game_id': row.product, 'rank': idx + 1} for idx, row in
+    #             enumerate(recommendations)]
+    #
+    #
+    # recommendations_rdd = df_user_idx.rdd.map(recommend_for_user)
+    # recommendations_list = recommendations_rdd.collect()
 
+    #
+    # 有个中间数据型要先写入json
+    sample_recommended = 'sample_result/sample_recommended.json'
+    # write into json
+    with open(sample_recommended, 'w') as output_file:
+        for user_idx in range(0, df_user_idx.count()):
+            try:
+                lst_recommended = [i.product for i in als_model.recommendProducts(user_idx, 10)]
+                ranks = 1
+                for app_id in lst_recommended:
+                    dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'ranks': ranks}
+                    json.dump(dict_recommended, output_file)
+                    output_file.write('\n')
+                    ranks += 1
+            # some user index may not in the recommendation result since it's been filtered out
+            except:
+                pass
 
-    recommendations_rdd = df_user_idx.rdd.map(recommend_for_user)
-    recommendations_list = recommendations_rdd.collect()
-
-    # #
-    # # 有个中间数据型要先写入json
-    # sample_recommended = 'sample_result/sample_recommended.json'
-    # # write into json
-    # with open(sample_recommended, 'w') as output_file:
-    #     for user_idx in range(0, df_user_idx.count()):
-    #         try:
-    #             lst_recommended = [i.product for i in als_model.recommendProducts(user_idx, 10)]
-    #             ranks = 1
-    #             for app_id in lst_recommended:
-    #                 dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'ranks': ranks}
-    #                 json.dump(dict_recommended, output_file)
-    #                 output_file.write('\n')
-    #                 ranks += 1
-    #         # some user index may not in the recommendation result since it's been filtered out
-    #         except:
-    #             pass
-
-    # df_recommend_result = spark.read.json(sample_recommended)
+    df_recommend_result = spark.read.json(sample_recommended)
     print("sample_result/sample_recommended.json 临时文件表")
     df_recommend_result.show(20)
     print("df_recommend_result count: ")
