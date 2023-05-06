@@ -173,24 +173,38 @@ if __name__ == '__main__':
 
     #
     # 有个中间数据型要先写入json
-    sample_recommended = 'sample_result/sample_recommended.json'
-    # write into json
-    with open(sample_recommended, 'w') as output_file:
-        for user_idx in range(0, df_user_idx.count()):
-            try:
-                lst_recommended = [i.product for i in als_model.recommendProducts(user_idx, 10)]
-                ranks = 1
-                for app_id in lst_recommended:
-                    dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'ranks': ranks}
-                    json.dump(dict_recommended, output_file)
-                    output_file.write('\n')
-                    ranks += 1
-            # some user index may not in the recommendation result since it's been filtered out
-            except:
-                pass
+    # sample_recommended = 'sample_result/sample_recommended.json'
+    # # write into json
+    # with open(sample_recommended, 'w') as output_file:
+    #     for user_idx in range(0, df_user_idx.count()):
+    #         try:
+    #             lst_recommended = [i.product for i in als_model.recommendProducts(user_idx, 10)]
+    #             ranks = 1
+    #             for app_id in lst_recommended:
+    #                 dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'ranks': ranks}
+    #                 json.dump(dict_recommended, output_file)
+    #                 output_file.write('\n')
+    #                 ranks += 1
+    #         # some user index may not in the recommendation result since it's been filtered out
+    #         except:
+    #             pass
+    #
+    # print("存储完成")
+    # df_recommend_result = spark.read.json(sample_recommended)
+    lst_recommended = []
 
-    print("存储完成")
-    df_recommend_result = spark.read.json(sample_recommended)
+    for user_idx in range(0, df_user_idx.count()):
+        try:
+            ranks = 1
+            for app_id in [i.product for i in als_model.recommendProducts(user_idx, 10)]:
+                dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'ranks': ranks}
+                lst_recommended.append(dict_recommended)
+                ranks += 1
+        except:
+            pass
+
+    df_recommend_result = spark.createDataFrame(lst_recommended)
+    df_recommend_result.show()
     print("sample_result/sample_recommended.json 临时文件表")
     df_recommend_result.show(20)
     print("df_recommend_result count: ")
