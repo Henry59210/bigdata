@@ -107,7 +107,7 @@ if __name__ == '__main__':
     df_user_recent_games = spark.read.json("hdfs://localhost:9000/topics/user_recently_played_games/partition=0/*.json").dropDuplicates()
     df_user_recent_games.registerTempTable("user_recent_games")
     df_valid_user_recent_games = spark.sql("SELECT * FROM user_recent_games where total_count != 0")
-    df_valid_user_recent_games.show(1)
+    df_valid_user_recent_games.show(10)
     print("df_valid_user_recent_games count: ")
     print(df_valid_user_recent_games.count())
 
@@ -115,6 +115,10 @@ if __name__ == '__main__':
     df_user_idx_origin.registerTempTable('user_idx_origin')
     df_user_idx = spark.sql("SELECT ROW_NUMBER() OVER (ORDER BY user_id) - 1 AS user_idx, user_id FROM user_idx_origin;")
     df_user_idx.registerTempTable('user_idx')
+    df_user_idx.show(10)
+    print("df_user_idx count: ")
+    print(df_user_idx.count())
+
     df_valid_user_recent_games = spark.sql("SELECT b.user_idx, a.games FROM user_recent_games a \
                                                 JOIN user_idx b ON b.user_id = a.steamid WHERE a.total_count != 0")
     print("df_valid_user_recent_games")
