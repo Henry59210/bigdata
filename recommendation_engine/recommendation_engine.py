@@ -199,6 +199,7 @@ if __name__ == '__main__':
             for app_id in [i.product for i in als_model.recommendProducts(user_idx, 10)]:
                 dict_recommended = {'user_idx': user_idx, 'game_id': app_id, 'ranks': ranks}
                 lst_recommended.append(dict_recommended)
+                print(dict_recommended)
                 ranks += 1
         except:
             pass
