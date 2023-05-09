@@ -57,7 +57,6 @@ if __name__ == '__main__':
         "user": "root",
         "password": "111111",
         "driver": 'com.mysql.cj.jdbc.Driver',
-        "createTableColumnTypes": "INDEX popular_games_ranks_index (ranks)",
         "truncate": 'true'
     }
     global_popular_games_table = 'popular_games'
