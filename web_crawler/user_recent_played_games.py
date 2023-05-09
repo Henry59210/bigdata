@@ -46,7 +46,7 @@ def append():
     user_id = sys.argv[1]
     user_recent_played_games = get_user_recent_played_games(user_id)
     spark = SparkSession.builder.appName("games").getOrCreate()
-    user_idx_str = '{"user_idx": -1, "user_id": ' + user_id + '}'
+    user_idx_str = '{"user_idx": 10000000000, "user_id": ' + user_id + '}'
     dump_file(user_idx_file, user_idx_str)
     dump_file(user_recent_games_file, user_recent_played_games)
     df_user_idx_append = spark.read.json(user_idx_file)
