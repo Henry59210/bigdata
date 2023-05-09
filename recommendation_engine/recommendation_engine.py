@@ -44,9 +44,9 @@ if __name__ == '__main__':
     # find same app id in popular_games and game_detail
     # total played_hours is defined as ranks
     df_global_popular_games = spark.sql("SELECT b.name AS name, a.play_time AS ranks, b.steam_appid, b.header_image FROM \
-                                        popular_games a, game_detail b WHERE a.game_id = b.steam_appid ORDER BY ranks DESC")
+                                        popular_games a LEFT JOIN game_detail b ON a.game_id = b.steam_appid ORDER BY ranks DESC")
     print("find same app id in popular_games and game_detail")
-    df_global_popular_games.show()
+    df_global_popular_games.dropDuplicates().show()
     print("df_global_popular_games count:")
     print(df_global_popular_games.count())
 
