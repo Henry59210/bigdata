@@ -46,7 +46,7 @@ def append():
     user_id = sys.argv[1]
     user_recent_played_games = get_user_recent_played_games(user_id)
     spark = SparkSession.builder.appName("games").getOrCreate()
-    user_idx_str = '{"user_idx": 0, "user_id": ' + user_id + '}'
+    user_idx_str = '{"user_idx": -1, "user_id": ' + user_id + '}'
     dump_file(user_idx_file, user_idx_str)
     dump_file(user_recent_games_file, user_recent_played_games)
     df_user_idx_append = spark.read.json(user_idx_file)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
         als = ALS(userCol='user_idx', itemCol='appid', ratingCol='playtime_forever')
         model = als.fit(df_valid_user_recent_games)
-        model.transform(append()).show()
+        model.recommendForUserSubset(append(), 10)
 
         # # map and filter out the games whose playtime is 0
         # training_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
