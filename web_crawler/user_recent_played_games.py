@@ -60,6 +60,7 @@ def append():
                                                         JOIN user_idx1 b ON b.user_id = a.steamid \
                                                         LATERAL VIEW explode(a.games) exploded_games AS g \
                                                         WHERE a.total_count != 0")
+    df_valid_user_recent_games_append.show()
     return df_valid_user_recent_games_append
 
 
