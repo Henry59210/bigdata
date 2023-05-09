@@ -56,8 +56,8 @@ def append():
     df_user_recent_games_append.registerTempTable("user_recent_games1")
     df_user_recent_games_append.show()
     df_valid_user_recent_games_append = spark.sql("SELECT b.user_idx, g.appid, g.playtime_forever \
-                                                        FROM user_recent_games a \
-                                                        JOIN user_idx b ON b.user_id = a.steamid \
+                                                        FROM user_recent_games1 a \
+                                                        JOIN user_idx1 b ON b.user_id = a.steamid \
                                                         LATERAL VIEW explode(a.games) exploded_games AS g \
                                                         WHERE a.total_count != 0")
     return df_valid_user_recent_games_append
