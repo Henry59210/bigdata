@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
         als = ALS(userCol='user_idx', itemCol='appid', ratingCol='playtime_forever')
         model = als.fit(df_valid_user_recent_games)
-        model.recommendForUserSubset(append(), 10)
+        model.recommendForUserSubset(append(), 10).show()
 
         # # map and filter out the games whose playtime is 0
         # training_rdd = df_valid_user_recent_games.rdd.flatMapValues(lambda x: x) \
