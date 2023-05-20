@@ -1,0 +1,4 @@
+beautifulsoup4==4.11.2
+kafka_python==2.0.2
+pyspark==3.4.0
+Requests==2.30.0
