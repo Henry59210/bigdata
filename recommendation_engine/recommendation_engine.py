@@ -1,19 +1,20 @@
 import json
+import sys
 
 # import mysql.connector
 from pyspark.sql import SparkSession
 from pyspark.mllib.recommendation import ALS
-
 
 # game detail data
 
 topicsList = ["game_detail", "user_owned_games", "user_friend_list", "user_recently_played_games", "user_idx",
               "user_summary"]
 
+user_id = sys.argv[1]
+
 
 def get_hdfs_dir(topic):
     return "hdfs://localhost:9000/topics/" + topic + "/partition=0/"
-
 
 
 if __name__ == '__main__':
@@ -22,16 +23,26 @@ if __name__ == '__main__':
     # User
     # Owned
     # Games
+
     spark = SparkSession.builder.appName("games").getOrCreate()
 
-    df_user_owned_games = spark.read.json("hdfs://localhost:9000/topics/user_owned_games/partition=0/*.json").dropDuplicates()
+    df_user_owned_games = spark.read.json(get_hdfs_dir("user_owned_games")).dropDuplicates()
     df_user_owned_games.registerTempTable("user_owned_games")
 
-    df_game_detail = spark.read.json("hdfs://localhost:9000/topics/game_detail/partition=0/*.json").dropDuplicates()
+    df_game_detail = spark.read.json(get_hdfs_dir("game_detail")).dropDuplicates()
     df_game_detail.registerTempTable("game_detail")
+
+    df_user_friend_list = spark.read.json(get_hdfs_dir("user_friend_list")).dropDuplicates()
+    df_user_friend_list.registerTempTable("friend_list")
+
+    df_user_recent_games = spark.read.json(get_hdfs_dir("user_recently_played_games")).dropDuplicates()
+    df_user_recent_games.registerTempTable("user_recent_games")
+
+    df_user_idx_origin = spark.read.json(get_hdfs_dir("user_idx_origin")).dropDuplicates().dropDuplicates(['user_id'])
+    df_user_idx_origin.registerTempTable('user_idx_origin')
+
     print("df_game_detail count:")
     print(df_game_detail.count())
-
 
     print("top 10 games which have longest total played hours")
     df_global_popular_games = \
@@ -51,7 +62,7 @@ if __name__ == '__main__':
     print("df_global_popular_games count:")
     print(df_global_popular_games.count())
 
-    #df_global_popular_games写入MySQL
+    # df_global_popular_games写入MySQL
     url = 'jdbc:mysql://20.2.129.187/big_data?serverTimezone=Asia/Shanghai'
     mode = 'overwrite'
     df_global_popular_games_properties = {
@@ -64,16 +75,11 @@ if __name__ == '__main__':
     df_global_popular_games.write.jdbc(url=url, mode=mode, properties=df_global_popular_games_properties,
                                        table=global_popular_games_table)
 
-
-
     # #Local
     # Popularity
     # #find his/her friends
-    df_user_friend_list = spark.read.json("hdfs://localhost:9000/topics/user_friend_list/partition=0/*.json").dropDuplicates()
-    df_user_friend_list.registerTempTable("friend_list")
-    sample_user = '76561197960315617'
     df_friend_list = spark.sql("SELECT friends['steamid'] AS steamid FROM \
-                (SELECT EXPLODE(friends) AS friends FROM friend_list WHERE steamid = %s) a" % sample_user)
+                (SELECT EXPLODE(friends) AS friends FROM friend_list WHERE steamid = %s) a" % user_id)
     print("find his/her friends")
     df_friend_list.show(10)
     print("df_friend_list count: ")
@@ -97,21 +103,16 @@ if __name__ == '__main__':
     print("df_global_popular_games count: ")
     print(df_global_popular_games.count())
 
-
-
-
     # Collaborative
     # Filtering
     # Recommendation
     # System
-    df_user_recent_games = spark.read.json("hdfs://localhost:9000/topics/user_recently_played_games/partition=0/*.json").dropDuplicates()
     df_user_recent_games.registerTempTable("user_recent_games")
     df_valid_user_recent_games = spark.sql("SELECT * FROM user_recent_games where total_count != 0")
     df_valid_user_recent_games.show(10)
     print("df_valid_user_recent_games count: ")
     print(df_valid_user_recent_games.count())
 
-    df_user_idx_origin = spark.read.json("hdfs://localhost:9000/topics/user_idx/partition=0/*.json").dropDuplicates().dropDuplicates(['user_id'])
     df_user_idx_origin.registerTempTable('user_idx_origin')
     df_user_idx = spark.sql("SELECT ROW_NUMBER() OVER (ORDER BY user_id) - 1 AS user_idx, user_id FROM user_idx_origin a \
                                 LEFT JOIN user_recent_games b ON a.user_id = b.steamid WHERE b.steamid IS NOT NULL ;")
@@ -127,8 +128,6 @@ if __name__ == '__main__':
     print("f_valid_user_recent_games count: ")
     print(df_valid_user_recent_games.count())
 
-
-
     # ALS
     # map and filter out the games whose playtime is 0
     # training data
@@ -139,7 +138,6 @@ if __name__ == '__main__':
 
     als_model = ALS.trainImplicit(training_rdd, 10)
 
-
     # print out 10 recommendeds product for user of index 0
     result_rating = als_model.recommendProducts(0, 10)
     # print result_rating
@@ -148,11 +146,9 @@ if __name__ == '__main__':
     print("10 recommendeds product for user of index 0")
     try_df_result.sort("rating", ascending=False).show()
 
-
     # 定义一个函数，接受 user_idx 列的值作为参数，并调用 als_model.recommendProducts()
     # 创建 SparkSession
     spark = SparkSession.builder.getOrCreate()
-
 
     # 定义一个函数，接受 user_idx 列的值作为参数，并调用 als_model.recommendProducts()
     # def recommend_for_user(user_idx):
@@ -165,7 +161,6 @@ if __name__ == '__main__':
     # recommendations_list = df_user_idx.rdd.flatMap(lambda row: recommend_for_user(row.user_idx)).collect()
     #
 
-
     # # 将字典列表转换为 DataFrame
     # df_recommend_result = spark.createDataFrame(recommendations_list)
     # def recommend_for_user(row):
@@ -177,7 +172,6 @@ if __name__ == '__main__':
     #
     # recommendations_rdd = df_user_idx.rdd.map(recommend_for_user)
     # recommendations_list = recommendations_rdd.collect()
-
 
     # 有个中间数据型要先写入json
     sample_recommended = 'sample_result/sample_recommended.json'
@@ -225,7 +219,8 @@ if __name__ == '__main__':
     df_final_recommend_result = spark.sql("SELECT DISTINCT b.user_id, a.ranks, c.name, c.header_image, c.steam_appid \
                                             FROM recommend_result a, user_idx b, game_detail c \
                                             WHERE a.user_idx = b.user_idx AND a.game_id = c.steam_appid \
-                                            ORDER BY b.user_id, a.ranks").dropDuplicates().dropDuplicates(['user_id', 'name'])
+                                            ORDER BY b.user_id, a.ranks").dropDuplicates().dropDuplicates(
+        ['user_id', 'name'])
     print("final_recommend_result")
     df_final_recommend_result.show(20)
     print("df_final_recommend_result count: ")
@@ -239,12 +234,5 @@ if __name__ == '__main__':
         "truncate": 'true'
     }
     final_recommend_result_table = 'personal_recommendation'
-    df_final_recommend_result.write.jdbc(url=url, mode=mode, properties=df_global_popular_games_properties, table=final_recommend_result_table)
-
-
-
-
-
-
-
-
+    df_final_recommend_result.write.jdbc(url=url, mode=mode, properties=df_global_popular_games_properties,
+                                         table=final_recommend_result_table)
